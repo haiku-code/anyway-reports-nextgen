@@ -34,7 +34,7 @@ We need a staging environment on Firebase Hosting.
 | --- | --- |
 | Does production move to Firebase? | No. Netlify remains production. Firebase is staging only. |
 | Deploy trigger | Manual, via an npm script. No CI, no branch automation, no PR previews. |
-| Firebase project | A new project, created by the user. Project ID supplied at implementation time. |
+| Firebase project | `anyway-reports-staging`, created 2026-08-04 via `firebase projects:create`. Default Hosting site is provisioned. |
 | Tracking tags on staging | Stripped at build time. |
 | Search engine indexing | `noindex` meta tag. |
 
@@ -79,7 +79,7 @@ Two committed files at the repo root.
 ```json
 {
   "projects": {
-    "staging": "<project-id>"
+    "staging": "anyway-reports-staging"
   }
 }
 ```
@@ -95,7 +95,7 @@ Two committed files at the repo root.
   production.
 
 The staging URL is Firebase's default site URL for the project,
-`https://<project-id>.web.app`.
+`https://anyway-reports-staging.web.app`.
 
 ### 2. Tracking strip and `noindex` injection
 
@@ -163,7 +163,7 @@ Automated checks after implementation:
    contains **zero** occurrences of `chartbeat`, `fbq`, `gtag`, and **does**
    contain `noindex, nofollow`.
 3. Assert the equally.ai widget script is present in both builds.
-4. After the first deploy, fetch `https://<project-id>.web.app` and run
+4. After the first deploy, fetch `https://anyway-reports-staging.web.app` and run
    assertion 2 against the served HTML.
 
 ## Out of scope
