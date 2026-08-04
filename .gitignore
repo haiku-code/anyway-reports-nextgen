@@ -15,6 +15,9 @@ dist-ssr
 # Firebase CLI deploy cache
 .firebase/
 
+# Netlify CLI site link and cache
+.netlify/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
