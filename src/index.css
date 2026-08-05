@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @font-face {
   font-family: 'Moses Text';
@@ -18,7 +18,11 @@ html,
 body,
 #root {
   height: 100%;
-  font-family: 'Moses Display', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Moses Display',
+    system-ui,
+    -apple-system,
+    sans-serif;
   direction: rtl;
 }
 
@@ -54,6 +58,17 @@ body,
   }
 }
 
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .animate-fade-in-up {
   animation: fade-in-up 0.8s ease-out;
 }
@@ -64,4 +79,37 @@ body,
 
 .animate-slide-down {
   animation: slide-down 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* Search that replaces the header content once the in-page search is passed */
+.animate-header-search {
+  animation: slide-down 0.3s ease-out;
+}
+
+/* Logo and share icons coming back when the sticky search deactivates. Only
+   under md, where they are the ones that were actually taken off screen. */
+@media (max-width: 767px) {
+  .animate-header-restore {
+    animation: slide-down 0.3s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-header-search,
+  .animate-header-restore {
+    animation: none;
+  }
+}
+
+/* Mobile focus positioning for the in-page search */
+@media (max-width: 767px) {
+  .mobile-focused {
+    position: relative;
+    z-index: 1000;
+    scroll-margin-top: 2rem;
+  }
 }

@@ -12,6 +12,7 @@ import { ReportArticle } from './ReportArticle'
 import { MapEmbed } from './MapEmbed'
 import natunLogo from '../assets/natun_leshinuy_logo.png'
 import haikuLogo from '../assets/haiku_logo.svg'
+import { cn } from '../lib/utils'
 
 import type { School, InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
@@ -23,6 +24,10 @@ type Props = {
   selectedId: number | null
   setSelectedId: (id: number) => void
   selectedSchool: School | null
+  // Callback ref, so the observer in App re-attaches when the layout branch
+  // below swaps the wrapper around SchoolSelect for a different element.
+  searchRef: React.Ref<HTMLDivElement>
+  resultsRef: React.RefObject<HTMLDivElement | null>
 }
 
 const FooterContent: React.FC = () => {
@@ -34,35 +39,48 @@ const FooterContent: React.FC = () => {
             <div className="text-gray-600">
               <div className="flex flex-col md:flex-row md:flex-wrap justify-center gap-x-2 gap-y-1">
                 <div className="flex justify-center md:inline">
-                  <span>פיתוח והטמעה: <strong>יובל בר לוי</strong></span>
+                  <span>
+                    פיתוח והטמעה: <strong>יובל בר לוי</strong>
+                  </span>
                 </div>
                 <div className="hidden md:inline">
                   <span className="hidden md:inline">|</span>
                 </div>
                 <div className="flex justify-center md:inline">
-                  <span>ניתוח נתונים ועריכת הדו״ח: <strong>גל רייך</strong> ו<strong>עתליה אלון</strong></span>
+                  <span>
+                    ניתוח נתונים ועריכת הדו״ח: <strong>גל רייך</strong> ו<strong>עתליה אלון</strong>
+                  </span>
                 </div>
                 <div className="hidden md:inline">
                   <span className="hidden md:inline">|</span>
                 </div>
                 <div className="flex justify-center md:inline">
-                  <span>עורך: <strong>אופיר שמיר</strong></span>
+                  <span>
+                    עורך: <strong>אופיר שמיר</strong>
+                  </span>
                 </div>
                 <div className="hidden md:inline">
                   <span>|</span>
                 </div>
                 <div className="flex justify-center md:inline">
-                  <span>ניהול פרויקט: <strong>ראיין קורנל</strong></span>
+                  <span>
+                    ניהול פרויקט: <strong>ראיין קורנל</strong>
+                  </span>
                 </div>
               </div>
             </div>
             <div className="text-center my-2">
               <div className="text-gray-600">
                 <div className="flex justify-center mb-2">
-                  <span>צילומים: <strong>shutterstock</strong></span>
+                  <span>
+                    צילומים: <strong>shutterstock</strong>
+                  </span>
                 </div>
                 <div className="flex justify-center">
-                  <span>תודה מיוחדת: <strong>דרור רשף</strong>, <strong>אבי קליימן</strong>, <strong>תמר קליר</strong> וקהילת מתנדבי נתון לשינוי</span>
+                  <span>
+                    תודה מיוחדת: <strong>דרור רשף</strong>, <strong>אבי קליימן</strong>,{' '}
+                    <strong>תמר קליר</strong> וקהילת מתנדבי נתון לשינוי
+                  </span>
                 </div>
               </div>
             </div>
@@ -75,7 +93,11 @@ const FooterContent: React.FC = () => {
                 rel="noopener noreferrer"
                 className="block hover:opacity-80 transition-opacity duration-200"
               >
-                <img src={natunLogo} alt="נתון לשינוי" className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain" />
+                <img
+                  src={natunLogo}
+                  alt="נתון לשינוי"
+                  className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain"
+                />
               </a>
             </div>
 
@@ -86,20 +108,28 @@ const FooterContent: React.FC = () => {
                 rel="noopener noreferrer"
                 className="block hover:opacity-80 transition-opacity duration-200"
               >
-                <img src={haikuLogo} alt="Haiku" className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain" />
+                <img
+                  src={haikuLogo}
+                  alt="Haiku"
+                  className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain"
+                />
               </a>
             </div>
-
-
           </div>
-
         </div>
       </div>
     </>
   )
 }
 
-export const Report: React.FC<Props> = ({ schools, selectedId, setSelectedId, selectedSchool }) => {
+export const Report: React.FC<Props> = ({
+  schools,
+  selectedId,
+  setSelectedId,
+  selectedSchool,
+  searchRef,
+  resultsRef,
+}) => {
   const [injuredStats, setInjuredStats] = useState<InjuredYearRecord[] | null>(null)
   const [monthStats, setMonthStats] = useState<MonthlyRecord[] | null>(null)
   const [genderStats, setGenderStats] = useState<SexRecord[] | null>(null)
@@ -128,7 +158,9 @@ export const Report: React.FC<Props> = ({ schools, selectedId, setSelectedId, se
 
   return (
     <div className={containerSpacing}>
-      <div className={mainContentSpacing}>
+      {/* scroll-mt keeps the sticky header from covering this block when the
+          sticky search scrolls back to it */}
+      <div ref={resultsRef} className={cn(mainContentSpacing, 'scroll-mt-16')}>
         {/* Searchbox Section - Responsive Layout */}
         {!selectedSchool ? (
           // When no school is selected - centered and full width
@@ -137,14 +169,20 @@ export const Report: React.FC<Props> = ({ schools, selectedId, setSelectedId, se
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800 my-4">חפש מוסד חינוך:</h2>
               </div>
-              <SchoolSelect schools={schools} onSelectId={setSelectedId} />
+              <div id="schoolSearch" ref={searchRef} className="scroll-mt-16">
+                <SchoolSelect schools={schools} onSelectId={setSelectedId} />
+              </div>
             </div>
           </div>
         ) : (
           // When school is selected - original layout
           <div className="flex flex-col lg:flex-row gap-6 mb-16">
             <div className="lg:w-[30%] w-full">
-              <div className="rounded-lg border border-neutral-200/70 p-3 mb-3">
+              <div
+                id="schoolSearch"
+                ref={searchRef}
+                className="rounded-lg border border-neutral-200/70 p-3 mb-3 scroll-mt-16"
+              >
                 <SchoolSelect schools={schools} onSelectId={setSelectedId} />
               </div>
               {selectedSchool && (

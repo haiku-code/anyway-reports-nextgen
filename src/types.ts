@@ -1,3 +1,14 @@
+// Where a SchoolSelect instance is rendered. Drives its sizing and whether it
+// scrolls itself into view on mobile focus.
+// Const object rather than a TS enum because tsconfig sets erasableSyntaxOnly,
+// which rejects enums outright.
+export const SchoolSelectVariant = {
+  Page: 'page',
+  Sticky: 'sticky',
+} as const
+
+export type SchoolSelectVariant = (typeof SchoolSelectVariant)[keyof typeof SchoolSelectVariant]
+
 export type School = {
   school_id: number
   school_name: string

@@ -18,6 +18,9 @@ dist-ssr
 # Netlify CLI site link and cache
 .netlify/
 
+# Playwright MCP browser snapshots and screenshots
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
