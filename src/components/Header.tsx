@@ -1,6 +1,7 @@
 import React from 'react'
 import { SchoolSelect } from './SchoolSelect'
 import { cn } from '../lib/utils'
+import { useIsScrolled } from '../hooks/useIsScrolled'
 import { SchoolSelectVariant, type School } from '../types'
 import xIcon from '../assets/icons/x.svg'
 import whatsappIcon from '../assets/icons/whatsapp.svg'
@@ -15,16 +16,7 @@ type Props = {
 }
 
 export const Header: React.FC<Props> = ({ schools, selectedId, onSelectSchool, showSearch }) => {
-  const [isScrolled, setIsScrolled] = React.useState(false)
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  const isScrolled = useIsScrolled()
 
   const getShareData = () => {
     const title = 'הכבישים המסוכנים בדרך לבית הספר שלכם - ynet'

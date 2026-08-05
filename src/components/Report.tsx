@@ -17,7 +17,7 @@ import { cn } from '../lib/utils'
 
 import type { School, InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
-const containerSpacing = 'px-4 sm:p-6'
+const containerSpacing = 'p-4 pt-6 sm:p-6'
 const mainContentSpacing = 'lg:px-16 2xl:px-72 mb-16'
 
 type Props = {
