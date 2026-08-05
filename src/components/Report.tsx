@@ -10,6 +10,7 @@ import TransportationStats from './TransportationStats'
 import EducationalClustersTable from './EducationalClustersTable'
 import { ReportArticle } from './ReportArticle'
 import { MapEmbed } from './MapEmbed'
+import { TableCaption } from './Typography'
 import natunLogo from '../assets/natun_leshinuy_logo.png'
 import haikuLogo from '../assets/haiku_logo.svg'
 import { cn } from '../lib/utils'
@@ -22,12 +23,13 @@ const mainContentSpacing = 'lg:px-16 2xl:px-72 mb-16'
 type Props = {
   schools: School[]
   selectedId: number | null
-  setSelectedId: (id: number) => void
+  onSelectSchool: (id: number) => void
   selectedSchool: School | null
   // Callback ref, so the observer in App re-attaches when the layout branch
   // below swaps the wrapper around SchoolSelect for a different element.
   searchRef: React.Ref<HTMLDivElement>
   resultsRef: React.RefObject<HTMLDivElement | null>
+  statsRef: React.RefObject<HTMLDivElement | null>
 }
 
 const FooterContent: React.FC = () => {
@@ -125,10 +127,11 @@ const FooterContent: React.FC = () => {
 export const Report: React.FC<Props> = ({
   schools,
   selectedId,
-  setSelectedId,
+  onSelectSchool,
   selectedSchool,
   searchRef,
   resultsRef,
+  statsRef,
 }) => {
   const [injuredStats, setInjuredStats] = useState<InjuredYearRecord[] | null>(null)
   const [monthStats, setMonthStats] = useState<MonthlyRecord[] | null>(null)
@@ -167,10 +170,14 @@ export const Report: React.FC<Props> = ({
           <div className="w-full flex justify-center mb-16">
             <div className="w-full max-w-2xl">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800 my-4">חפש מוסד חינוך:</h2>
+                <TableCaption>חפשו את מוסד הלימודים שלכם</TableCaption>
               </div>
               <div id="schoolSearch" ref={searchRef} className="scroll-mt-16">
-                <SchoolSelect schools={schools} onSelectId={setSelectedId} />
+                <SchoolSelect
+                  schools={schools}
+                  selectedId={selectedId}
+                  onSelectId={onSelectSchool}
+                />
               </div>
             </div>
           </div>
@@ -183,10 +190,17 @@ export const Report: React.FC<Props> = ({
                 ref={searchRef}
                 className="rounded-lg border border-neutral-200/70 p-3 mb-3 scroll-mt-16"
               >
-                <SchoolSelect schools={schools} onSelectId={setSelectedId} />
+                <SchoolSelect
+                  schools={schools}
+                  selectedId={selectedId}
+                  onSelectId={onSelectSchool}
+                />
               </div>
               {selectedSchool && (
-                <div className="rounded-lg border border-neutral-200/70 p-3">
+                <div
+                  ref={statsRef}
+                  className="rounded-lg border border-neutral-200/70 p-3 scroll-mt-16"
+                >
                   <Stats
                     title={title}
                     injuredStats={injuredStats}

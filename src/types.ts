@@ -9,6 +9,22 @@ export const SchoolSelectVariant = {
 
 export type SchoolSelectVariant = (typeof SchoolSelectVariant)[keyof typeof SchoolSelectVariant]
 
+// One row of the school search. `label` is what gets matched against, so typing
+// a town name finds every institution in it; `name` and `city` are what the
+// result row shows in its two columns.
+export type Suggestion = {
+  id: number
+  name: string
+  city: string
+  label: string
+}
+
+// A slice of text returned by autosuggest-highlight's parse()
+export type ParsePart = {
+  text: string
+  highlight: boolean
+}
+
 export type School = {
   school_id: number
   school_name: string

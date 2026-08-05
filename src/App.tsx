@@ -5,6 +5,7 @@ import { Hero } from './components/Hero'
 import { Report } from './components/Report'
 import { useIsScrolledPast } from './hooks/useIsScrolledPast'
 import { scrollBehavior } from './lib/motion'
+import { isMobileViewport } from './lib/viewport'
 import type { School } from './types'
 
 export const App: React.FC = () => {
@@ -15,6 +16,7 @@ export const App: React.FC = () => {
   const [searchElement, setSearchElement] = useState<HTMLDivElement | null>(null)
   const [pendingResultsScroll, setPendingResultsScroll] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const statsRef = useRef<HTMLDivElement>(null)
 
   const isSearchScrolledPast = useIsScrolledPast(searchElement)
 
@@ -24,21 +26,32 @@ export const App: React.FC = () => {
       .then((res) => setSchools(res.data))
   }, [])
 
-  // Selecting from the sticky search has to bring the reader back to the map
-  // and stats. Keyed on selectedId so the scroll runs after Report has switched
-  // to the layout that actually contains them.
+  // Takes the reader to what they just searched for. Keyed on selectedId so the
+  // scroll runs after Report has switched to the layout that contains it.
+  // Under md the columns stack, so the stats sit right under the search and are
+  // the thing worth landing on. Wider up, stats and map share one row and the
+  // top of the block shows both at once.
   useEffect(() => {
     if (!pendingResultsScroll) return
     setPendingResultsScroll(false)
-    resultsRef.current?.scrollIntoView({
+
+    const target = (isMobileViewport() && statsRef.current) || resultsRef.current
+    target?.scrollIntoView({
       behavior: scrollBehavior(),
       block: 'start',
     })
   }, [selectedId, pendingResultsScroll])
 
-  const handleStickySelect = (id: number) => {
+  const handleHeaderSelect = (id: number) => {
     setSelectedId(id)
     setPendingResultsScroll(true)
+  }
+
+  // The in-page search already sits next to the results on a wide screen, so
+  // only the stacked mobile layout needs the page moved.
+  const handlePageSelect = (id: number) => {
+    setSelectedId(id)
+    setPendingResultsScroll(isMobileViewport())
   }
 
   const selectedSchool = useMemo(
@@ -50,17 +63,19 @@ export const App: React.FC = () => {
     <main className="bg-white">
       <Header
         schools={schools}
-        onSelectSchool={handleStickySelect}
+        selectedId={selectedId}
+        onSelectSchool={handleHeaderSelect}
         showSearch={isSearchScrolledPast}
       />
       <Hero />
       <Report
         schools={schools}
         selectedId={selectedId}
-        setSelectedId={(id: number) => setSelectedId(id)}
+        onSelectSchool={handlePageSelect}
         selectedSchool={selectedSchool}
         searchRef={setSearchElement}
         resultsRef={resultsRef}
+        statsRef={statsRef}
       />
     </main>
   )

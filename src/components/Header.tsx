@@ -9,11 +9,12 @@ import ynetLogo from '../assets/ynet_logo.svg'
 
 type Props = {
   schools: School[]
+  selectedId: number | null
   onSelectSchool: (id: number) => void
   showSearch: boolean
 }
 
-export const Header: React.FC<Props> = ({ schools, onSelectSchool, showSearch }) => {
+export const Header: React.FC<Props> = ({ schools, selectedId, onSelectSchool, showSearch }) => {
   const [isScrolled, setIsScrolled] = React.useState(false)
 
   React.useEffect(() => {
@@ -78,6 +79,7 @@ export const Header: React.FC<Props> = ({ schools, onSelectSchool, showSearch })
           <div className="flex-1 md:max-w-md animate-header-search">
             <SchoolSelect
               schools={schools}
+              selectedId={selectedId}
               onSelectId={onSelectSchool}
               variant={SchoolSelectVariant.Sticky}
             />

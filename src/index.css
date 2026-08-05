@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+@theme {
+  /* The report's ink, already hardcoded in Typography.tsx. The search is built
+     from it alone: red belongs to the charts, where it means fatalities. */
+  --color-ink: #302727;
+  /* Moses Text is the companion of Moses Display, for metadata and figures */
+  --font-text: 'Moses Text', system-ui, -apple-system, sans-serif;
+}
+
 @font-face {
   font-family: 'Moses Text';
   src: url('/assets/MosesText_1.0VF.ttf') format('truetype');
@@ -58,17 +66,6 @@ body,
   }
 }
 
-@keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 .animate-fade-in-up {
   animation: fade-in-up 0.8s ease-out;
 }
@@ -81,13 +78,14 @@ body,
   animation: slide-down 0.3s ease-out;
 }
 
-.animate-slide-in-right {
-  animation: slide-in-right 0.3s ease-out;
-}
-
 /* Search that replaces the header content once the in-page search is passed */
 .animate-header-search {
   animation: slide-down 0.3s ease-out;
+}
+
+/* Results panel under the school search */
+.animate-search-panel {
+  animation: slide-down 0.2s ease-out;
 }
 
 /* Logo and share icons coming back when the sticky search deactivates. Only
@@ -98,9 +96,13 @@ body,
   }
 }
 
+/* Only classes whose element is visible without the animation belong here.
+   .animate-fade-in-up starts from an inline opacity-0 in Hero.tsx, so killing
+   its animation would leave that content invisible. */
 @media (prefers-reduced-motion: reduce) {
   .animate-header-search,
-  .animate-header-restore {
+  .animate-header-restore,
+  .animate-search-panel {
     animation: none;
   }
 }
