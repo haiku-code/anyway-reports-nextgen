@@ -6,6 +6,18 @@
   --color-ink: #302727;
   /* Moses Text is the companion of Moses Display, for metadata and figures */
   --font-text: 'Moses Text', system-ui, -apple-system, sans-serif;
+
+  /* Direction of change in casualty counts. Up is always the bad direction here,
+     because every figure these tint is a count of injured or killed people.
+     Kept apart from the severity red of the charts, which means fatalities, not
+     a trend. Never carries the meaning alone: each place these appear also
+     prints an arrow and the word ירידה or עלייה, so the reading survives color
+     blindness and grayscale print. The two -surface tints are the pill fills,
+     and both take their own ink above 4.5:1. */
+  --color-trend-up: #c8102e;
+  --color-trend-up-surface: #fbe1e4;
+  --color-trend-down: #1a7a48;
+  --color-trend-down-surface: #dff0e6;
 }
 
 @font-face {

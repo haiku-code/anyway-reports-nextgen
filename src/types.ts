@@ -76,21 +76,54 @@ export type MunicipalityComparison = {
   trend: 'improvement' | 'worsening'
 }
 
+// The four ways a child gets to school that the PDF report counts separately.
+// The id is what picks the card's icon; the Hebrew name lives with the data.
+// Const object rather than a TS enum for the erasableSyntaxOnly reason above.
+export const TransportMode = {
+  EScooter: 'e-scooter',
+  Pedestrian: 'pedestrian',
+  EBike: 'e-bike',
+  Bike: 'bike',
+} as const
+
+export type TransportMode = (typeof TransportMode)[keyof typeof TransportMode]
+
+// One period's casualties for one transport mode. `totalInjured` is the sum of
+// the three severities and is carried rather than derived, because it is a
+// figure printed in the source PDF.
+export type CasualtyCounts = {
+  totalInjured: number
+  lightInjuries: number
+  severeInjuries: number
+  deaths: number
+}
+
 // Transportation mode statistics
 export type TransportationModeStats = {
+  id: TransportMode
   mode: string
-  period2015_2020: {
-    totalInjured: number
-    lightInjuries: number
-    severeInjuries: number
-    deaths: number
-  }
-  period2020_2025: {
-    totalInjured: number
-    lightInjuries: number
-    severeInjuries: number
-    deaths: number
-  }
+  period2015_2020: CasualtyCounts
+  period2020_2025: CasualtyCounts
+}
+
+// Which way a count moved between the two periods. Flat exists so a pair of
+// equal counts never has to pick an arrow; no row in today's data hits it.
+export const TrendDirection = {
+  Up: 'up',
+  Down: 'down',
+  Flat: 'flat',
+} as const
+
+export type TrendDirection = (typeof TrendDirection)[keyof typeof TrendDirection]
+
+// A change between the two periods, ready to print. `percent` is already
+// formatted and signed ("+450.9%"), because the rounding rule that drops a
+// trailing .0 belongs in one place rather than at every call site.
+export type CasualtyDelta = {
+  direction: TrendDirection
+  percent: string
+  // ירידה / עלייה. The word is what carries the meaning when color cannot.
+  label: string
 }
 
 // City ranking data
