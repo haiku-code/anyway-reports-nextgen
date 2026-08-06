@@ -184,7 +184,7 @@ export const Report: React.FC<Props> = ({
         ) : (
           // When school is selected - original layout
           <div className="flex flex-col lg:flex-row gap-6 mb-16">
-            <div className="lg:w-[30%] w-full">
+            <div className="lg:w-[36%] w-full">
               <div
                 id="schoolSearch"
                 ref={searchRef}

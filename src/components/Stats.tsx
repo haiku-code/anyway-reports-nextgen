@@ -21,6 +21,12 @@ const HEBREW_MONTHS = [
   'דצמבר',
 ]
 
+const SEVERITIES = [
+  { key: 'light_injured_count', name: 'פצועים קל', color: '#ffd82b' },
+  { key: 'severly_injured_count', name: 'פצועים קשה', color: '#ff9f1c' },
+  { key: 'killed_count', name: 'הרוגים', color: '#d81c32' },
+] as const
+
 function getFromStatsByYear(stats: InjuredYearRecord[], year: number, severity: string) {
   const yearRecord =
     _.find(stats, { accident_year: year }) ?? _.find(stats, { accident_year: String(year) })
@@ -50,13 +56,13 @@ function severityStatsByYear(
   }
 }
 
+function severityTotal(stats: InjuredYearRecord[], severity: string) {
+  return _.sum(years.map((year) => getFromStatsByYear(stats, Number(year), severity)))
+}
+
 function lineOptions(stats: InjuredYearRecord[] | null): Options {
   const series = stats
-    ? [
-        severityStatsByYear(stats, 'light_injured_count', 'פצועים קל', '#ffd82b'),
-        severityStatsByYear(stats, 'severly_injured_count', 'פצועים קשה', '#ff9f1c'),
-        severityStatsByYear(stats, 'killed_count', 'הרוגים', '#d81c32'),
-      ]
+    ? SEVERITIES.map((s) => severityStatsByYear(stats, s.key, s.name, s.color))
     : []
   return {
     chart: { height: 250, type: 'line' },
@@ -120,6 +126,13 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
   const [isHighlighted, setIsHighlighted] = useState(false)
   const line = useMemo(() => lineOptions(injuredStats), [injuredStats])
   const column = useMemo(() => columnOptions(monthStats), [monthStats])
+  const summary = useMemo(
+    () =>
+      injuredStats
+        ? SEVERITIES.map((s) => ({ ...s, total: severityTotal(injuredStats, s.key) }))
+        : null,
+    [injuredStats]
+  )
 
   useEffect(() => {
     if (title) {
@@ -131,43 +144,33 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
 
   return (
     <div>
-      <div className={`text-xl font-bold transition-all duration-300 ${
-        isHighlighted 
-          ? 'text-blue-600 scale-[1.03] drop-shadow-lg' 
-          : 'text-gray-800'
-      }`}>
+      <div
+        className={`text-xl font-bold transition-all duration-300 ${
+          isHighlighted ? 'text-blue-600 scale-[1.03] drop-shadow-lg' : 'text-gray-800'
+        }`}
+      >
         {title || ''}
       </div>
 
-      {injuredStats && (
-        <div className="text-sm font-semibold">
-          <div className="mb-1">ב-5 השנים האחרונות,</div>
-          {(() => {
-            const series = [
-              severityStatsByYear(injuredStats, 'light_injured_count', 'פצועים קל', '#ffd82b'),
-              severityStatsByYear(injuredStats, 'severly_injured_count', 'פצועים קשה', '#ff9f1c'),
-              severityStatsByYear(injuredStats, 'killed_count', 'הרוגים', '#d81c32'),
-            ]
-            const summary = series.reduce<Record<string, { sumInjured: number; color: string }>>(
-              (acc, s: any) => {
-                const sumInjured = _.sum(s.data as number[])
-                acc[s.name] = { sumInjured, color: s.color }
-                return acc
-              },
-              {}
-            )
-            return (
-              <div>
-                {Object.entries(summary).map(([k, v]) => (
-                  <div key={k}>
-                    {v.sumInjured} <span style={{ color: v.color }}>{k}</span>
-                  </div>
-                ))}
-                <div>בקרב הולכי רגל, רוכבי אופניים וקורקינט בגיל 5-19</div>
-              </div>
-            )
-          })()}
-        </div>
+      {summary && (
+        <p className="text-sm font-semibold leading-snug">
+          {/* the intro and the three counts stay on one line of their own; the
+              qualifier starts a new line. below lg the panel is too narrow to
+              hold the counts on one line, so they are allowed to wrap there */}
+          <span className="block lg:whitespace-nowrap">
+            ב-5 השנים האחרונות,{' '}
+            {summary.map((s, i) => (
+              <React.Fragment key={s.key}>
+                {s.total} <span style={{ color: s.color }}>{s.name}</span>
+                {i < summary.length - 1 && <span className="me-2">,</span>}
+              </React.Fragment>
+            ))}
+          </span>
+          <span className="block">
+            בקרב הולכי רגל, רוכבי אופניים וקורקינט בגיל{' '}
+            <span className="whitespace-nowrap">5-19</span>
+          </span>
+        </p>
       )}
 
       {injuredStats && (
