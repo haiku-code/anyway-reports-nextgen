@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react'
 import _ from 'lodash'
 import type { Options } from 'highcharts'
 import { Graph } from './Graph'
+import { GenderSplitBar } from './GenderSplitBar'
 import type { InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
 const years = ['2020', '2021', '2022', '2023', '2024', '2025'] as const
@@ -108,41 +109,6 @@ function columnOptions(stats: MonthlyRecord[] | null): Options {
   }
 }
 
-function pieOptions(stats: SexRecord[] | null): Options {
-  const total = _.sumBy(stats, 'count_1') || 0
-  const series = [
-    {
-      colorByPoint: true,
-      type: 'pie',
-      data: _.map(stats, (s) => ({
-        name: (s as any).sex_hebrew,
-        y: total ? Math.trunc(((s as any).count_1 / total) * 10000) / 100 : 0,
-      })),
-      dataLabels: {
-        connectorWidth: 0,
-        connectorPadding: -10,
-        formatter: function (): string {
-          // @ts-expect-error Highcharts format context
-          return `${this.point.y}%`
-        },
-        distance: 15,
-        style: { fontSize: '12px', fontWeight: 'normal' },
-      },
-    } as any,
-  ]
-  return {
-    chart: { height: 250, type: 'pie' },
-    credits: { enabled: false },
-    title: { text: '' },
-    tooltip: { enabled: false },
-    series,
-    plotOptions: {
-      series: { enableMouseTracking: false, states: { hover: { enabled: false } } },
-      pie: { borderWidth: 0, borderColor: null as any, showInLegend: true },
-    },
-  }
-}
-
 type Props = {
   title: string
   injuredStats: InjuredYearRecord[] | null
@@ -154,7 +120,6 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
   const [isHighlighted, setIsHighlighted] = useState(false)
   const line = useMemo(() => lineOptions(injuredStats), [injuredStats])
   const column = useMemo(() => columnOptions(monthStats), [monthStats])
-  const pie = useMemo(() => pieOptions(genderStats), [genderStats])
 
   useEffect(() => {
     if (title) {
@@ -219,10 +184,10 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
         </section>
       )}
 
-      {genderStats && (
-        <section>
-          <div className="text-base font-semibold mb-1">נפגעים לפי מין</div>
-          <Graph options={pie} />
+      {genderStats && genderStats.length > 0 && (
+        <section className="mt-3">
+          <div className="text-base font-semibold mb-2">נפגעים לפי מין</div>
+          <GenderSplitBar stats={genderStats} />
         </section>
       )}
     </div>

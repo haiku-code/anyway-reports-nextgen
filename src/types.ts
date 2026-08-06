@@ -50,6 +50,24 @@ export type SexRecord = {
   count_1: number
 }
 
+// Fill of one segment of the gender bar, plus the label color that stays
+// readable on it. Values live in constants/genderSplit.ts.
+export type GenderTone = {
+  fill: string
+  text: string
+}
+
+// One segment of the gender bar. `share` is the exact percentage and drives the
+// segment width; `percent` is the rounded one that gets printed, and a set of
+// slices always prints to exactly 100.
+export type GenderSlice = {
+  name: string
+  count: number
+  share: number
+  percent: number
+  tone: GenderTone
+}
+
 // Municipality comparison data
 export type MunicipalityComparison = {
   cityName: string
