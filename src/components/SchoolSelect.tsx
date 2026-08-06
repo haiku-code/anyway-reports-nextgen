@@ -8,6 +8,7 @@ import { SchoolSelectVariant, type ParsePart, type School, type Suggestion } fro
 import { cn } from '../lib/utils'
 import { scrollBehavior } from '../lib/motion'
 import { getSearchStatus } from '../lib/searchStatus'
+import { getCityName } from '../lib/school'
 import { isMobileViewport } from '../lib/viewport'
 
 const MAX_SUGGESTIONS = 15
@@ -63,7 +64,7 @@ export const SchoolSelect: React.FC<Props> = ({
 
   const data: Suggestion[] = useMemo(() => {
     return schools.map((school) => {
-      const city = (school.yishuv_name ?? '').replace(/^"|"$/g, '')
+      const city = getCityName(school)
       return {
         id: school.school_id,
         name: school.school_name,
