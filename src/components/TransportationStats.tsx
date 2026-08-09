@@ -1,32 +1,10 @@
 import { useState } from 'react'
-import {
-  TRANSPORTATION_MODES,
-  TRANSPORTATION_PERIODS,
-  TRANSPORTATION_TOTALS,
-} from '../constants/transportationStats'
-import { formatCount, toDelta, toSevereOrKilled } from '../lib/transportationTrend'
+import { TRANSPORTATION_MODES, TRANSPORTATION_PERIODS } from '../constants/transportationStats'
+import { toDelta } from '../lib/transportationTrend'
 import { TransportMode } from '../types'
+import CasualtyOverviewCard from './CasualtyOverviewCard'
 import TransportationModeCard from './TransportationModeCard'
-import TrendPill from './TrendPill'
 import Typography, { TableCaption } from './Typography'
-
-const { period2015_2020: totalsBefore, period2020_2025: totalsAfter } = TRANSPORTATION_TOTALS
-
-// The two figures the section opens on. Total casualties fell, yet the count of
-// people killed or badly hurt rose: one number on its own tells the wrong
-// story, so they are printed side by side and the reader gets both at once.
-const OVERVIEW = [
-  {
-    label: 'סה״כ נפגעים',
-    value: totalsAfter.totalInjured,
-    delta: toDelta(totalsAfter.totalInjured, totalsBefore.totalInjured),
-  },
-  {
-    label: 'פצועים קשה + הרוגים',
-    value: toSevereOrKilled(totalsAfter),
-    delta: toDelta(toSevereOrKilled(totalsAfter), toSevereOrKilled(totalsBefore)),
-  },
-]
 
 // The finding the section exists for. Both figures are read off the data rather
 // than written into the copy, so the sentence cannot drift from the cards under
@@ -70,81 +48,77 @@ export default function TransportationStats() {
       </div>
 
       <div className="bg-white border border-gray-200 border-t-0 rounded-b-lg p-4">
-        {/* The cards are read one after another rather than scanned across, so
-            they stay in a measured column instead of stretching to the width of
-            the tables above. */}
-        <div className="mx-auto max-w-[560px]">
-          <div className="mb-3 rounded-lg border border-gray-200 p-4">
-            <Typography
-              variant="table-header"
-              className="mb-3 border-b border-gray-200 pb-3 text-center text-gray-700"
-            >
-              מבט על · סה״כ נפגעים מכל הסוגים
-            </Typography>
-            <dl className="grid grid-cols-2 gap-3">
-              {OVERVIEW.map((item) => (
-                <div key={item.label} className="text-center">
-                  <dt>
-                    <Typography variant="table-body" as="span" className="text-gray-600">
-                      {item.label}
-                    </Typography>
-                  </dt>
-                  <dd>
-                    {/* Proportional figures, not tabular. Nothing here lines up
-                        into a column, and Moses Text's tabular set gives the
-                        thousands comma a full digit advance, which opens 6,260
-                        into "6 , 260". */}
-                    <span className="my-2 block font-text text-[32px] leading-none font-extrabold text-gray-800">
-                      {formatCount(item.value)}
-                    </span>
-                    <TrendPill delta={item.delta} />
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+        {/* Narrow screens read the cards one after another, so the column stays
+            measured rather than stretching to the width of the tables above.
+            From lg the cards go four across and the section takes the full
+            width, because that is what lets a reader compare the modes. */}
+        <div className="mx-auto max-w-[560px] lg:max-w-none">
+          {/* The two summaries share a row once there is width for it. They are
+              a pair: the overview says casualties fell, the alert says which
+              mode is the exception, and side by side that reads as one thought
+              rather than two stacked announcements. */}
+          <div className="lg:mb-5 lg:grid lg:grid-cols-2 lg:gap-4">
+            {/* Wide screens only. Narrow ones show this card up in the article,
+                rendered from the same component. Swapped with responsive classes
+                rather than a viewport hook, so there is no first-paint flash of
+                the wrong one, and display:none keeps the hidden copy out of the
+                accessibility tree rather than reading the figures out twice. */}
+            <CasualtyOverviewCard className="mb-3 hidden md:block lg:mb-0" />
 
-          {/* Fenced by a heavy edge on the side the text starts from as well as
-              tinted, so it reads as set apart from the cards even where the tint
-              does not survive. border-s, not border-r, so it stays on the
-              reading edge. */}
-          <div className="mb-5 rounded-lg border border-gray-200 border-s-4 border-s-trend-up bg-trend-up-surface/50 p-4">
-            <Typography
-              variant="table-header"
-              className="mb-2 flex items-center gap-2 text-trend-up"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                className="size-5 shrink-0"
+            {/* Fenced by a heavy edge on the side the text starts from as well
+                as tinted, so it reads as set apart from the cards even where the
+                tint does not survive. border-s, not border-r, so it stays on the
+                reading edge. */}
+            {/* Centred rather than top-aligned: the grid stretches this box to
+                the overview card's height, and its three lines of text would
+                otherwise sit against the top edge over a pool of empty tint. */}
+            <div className="mb-5 rounded-lg border border-gray-200 border-s-4 border-s-trend-up bg-trend-up-surface/50 p-4 lg:mb-0 lg:flex lg:flex-col lg:justify-center">
+              <Typography
+                variant="table-header"
+                className="mb-2 flex items-center gap-2 text-trend-up"
               >
-                <path d="m3 17 6-6 4 4 8-8m-6 0h6v6" />
-              </svg>
-              מגמת הזינוק · קורקינטים חשמליים
-            </Typography>
-            <Typography variant="table-body" as="p" className="leading-relaxed text-trend-up">
-              נרשמה עלייה חסרת תקדים של{' '}
-              <strong dir="ltr" className="font-bold">
-                {scooterTotalRise}
-              </strong>{' '}
-              בסה״כ הנפגעים מקורקינטים חשמליים, וזינוק של{' '}
-              <strong dir="ltr" className="font-bold">
-                {scooterSevereRise}
-              </strong>{' '}
-              במספר הפצועים קשה.
-            </Typography>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="size-5 shrink-0"
+                >
+                  <path d="m3 17 6-6 4 4 8-8m-6 0h6v6" />
+                </svg>
+                מגמת הזינוק · קורקינטים חשמליים
+              </Typography>
+              <Typography variant="table-body" as="p" className="leading-relaxed text-trend-up">
+                נרשמה עלייה חסרת תקדים של{' '}
+                <strong dir="ltr" className="font-bold">
+                  {scooterTotalRise}
+                </strong>{' '}
+                בסה״כ הנפגעים מקורקינטים חשמליים, וזינוק של{' '}
+                <strong dir="ltr" className="font-bold">
+                  {scooterSevereRise}
+                </strong>{' '}
+                במספר הפצועים קשה.
+              </Typography>
+            </div>
           </div>
 
           <Typography variant="table-header" className="mb-3 text-gray-700">
             פילוח לפי אמצעי תחבורה
           </Typography>
 
-          <ul className="flex flex-col gap-3">
+          {/* Two across at lg, four only at xl. The page container caps this
+              section at 809px on a 1024px screen, which leaves 185px per card
+              in a four-column row: narrower than the 195px a severity row needs,
+              so the text overflowed and the rows stopped lining up. Four across
+              is the point of the layout, so it waits for the width that lets it
+              work rather than being served broken.
+
+              items-stretch is what makes the panels a set rather than loose
+              cards: equal height, so their bottom rows share a line. */}
+          <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:items-stretch xl:grid-cols-4">
             {TRANSPORTATION_MODES.map((stats) => (
               <TransportationModeCard
                 key={stats.id}

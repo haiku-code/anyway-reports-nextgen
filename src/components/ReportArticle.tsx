@@ -1,4 +1,5 @@
 import React from 'react'
+import CasualtyOverviewCard from './CasualtyOverviewCard'
 import { MainContent } from './Typography'
 
 export const ReportArticle: React.FC = () => {
@@ -14,22 +15,9 @@ export const ReportArticle: React.FC = () => {
           המרכזית לסטטיסטיקה.
         </MainContent>
 
-        <div className="lg:float-right lg:ml-6 lg:mb-4 lg:w-1/2">
-          <div className="rounded-2xl overflow-hidden">
-            {/* Sits well below the fold, so it must not compete with the hero
-                image for bandwidth. width/height carry the intrinsic ratio so
-                the browser reserves the box before the file arrives. */}
-            <img
-              src="/images/article-content-image.jpg"
-              alt="תמונת תוכן מאמר - בטיחות ילדים"
-              width={1920}
-              height={1280}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-auto object-cover"
-            />
-          </div>
-        </div>
+        {/* Narrow screens only. On wide ones this card stays down in the
+            transport breakdown, where it heads the section it summarises. */}
+        <CasualtyOverviewCard className="md:hidden" />
 
         <MainContent className="text-neutral-800">
           מתוך 6,260 הילדים שנפגעו בסביבת הגנים ומוסדות החינוך ברחבי הארץ בחמש השנים האחרונות, 449
@@ -43,8 +31,6 @@ export const ReportArticle: React.FC = () => {
           בתקופה המקבילה). שיעורם עלה על חשבון הנפגעים שהשתמשו באופניים, שירד מ-15% ל-13%, ומספר
           הנפגעים שהשתמשו באופניים חשמליים &ndash; שירד מ-16% ל-12%.
         </MainContent>
-
-        <div className="clear-both"></div>
 
         <MainContent className="text-neutral-800">
           גל רייך מאירגון ׳נתון לשינוי׳, מוביל הפרויקט, מסביר כי &ldquo;סביבת מוסדות הלימוד היא
