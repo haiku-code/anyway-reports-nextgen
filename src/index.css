@@ -7,6 +7,12 @@
   /* Moses Text is the companion of Moses Display, for metadata and figures */
   --font-text: 'Moses Text', system-ui, -apple-system, sans-serif;
 
+  /* The pale blue the hero fades into, already used there as a literal rgba in
+     the scrims. As a token it tints the band behind the school search, so the
+     reader scrolls out of the hero and into one continuous zone rather than
+     onto white. It is a surface only: nothing reads meaning from it. */
+  --color-hero-mist: #e8f7fc;
+
   /* Direction of change in casualty counts. Up is always the bad direction here,
      because every figure these tint is a count of injured or killed people.
      Kept apart from the severity red of the charts, which means fatalities, not
@@ -119,11 +125,14 @@ body,
   }
 }
 
-/* Mobile focus positioning for the in-page search */
+/* Mobile focus positioning for the in-page search. The margin clears the
+   scrolled header, which is 3rem tall under md: at 2rem the field landed
+   underneath it and only its own z-index kept it readable, drawn over the logo
+   and the share icons. */
 @media (max-width: 767px) {
   .mobile-focused {
     position: relative;
     z-index: 1000;
-    scroll-margin-top: 2rem;
+    scroll-margin-top: 3.5rem;
   }
 }

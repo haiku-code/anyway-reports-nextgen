@@ -10,7 +10,7 @@ import TransportationStats from './TransportationStats'
 import EducationalClustersTable from './EducationalClustersTable'
 import { ReportArticle } from './ReportArticle'
 import { MapEmbed } from './MapEmbed'
-import { TableCaption } from './Typography'
+import { SectionCta } from './Typography'
 import natunLogo from '../assets/natun_leshinuy_logo.png'
 import haikuLogo from '../assets/haiku_logo.svg'
 import { cn } from '../lib/utils'
@@ -18,7 +18,12 @@ import { cn } from '../lib/utils'
 import type { School, InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
 const containerSpacing = 'p-4 pt-6 sm:p-6'
-const mainContentSpacing = 'lg:px-16 2xl:px-72 mb-16'
+// The horizontal halves of the two rules around them. A tinted band has to run
+// edge to edge, so it sits outside the padded container and puts the page
+// gutters back on its own contents.
+const containerGutters = 'px-4 sm:px-6'
+const mainContentGutters = 'lg:px-16 2xl:px-72'
+const mainContentSpacing = `${mainContentGutters} mb-16`
 
 type Props = {
   schools: School[]
@@ -160,43 +165,57 @@ export const Report: React.FC<Props> = ({
   const title = selectedSchool?.school_name ?? ''
 
   return (
-    <div className={containerSpacing}>
-      {/* scroll-mt keeps the sticky header from covering this block when the
-          sticky search scrolls back to it */}
-      <div ref={resultsRef} className={cn(mainContentSpacing, 'scroll-mt-16')}>
-        {/* Searchbox Section - Responsive Layout */}
-        {!selectedSchool ? (
-          // When no school is selected - centered and full width
-          <div className="w-full flex justify-center mb-16">
-            <div className="w-full max-w-2xl">
-              <div className="text-center mb-8">
-                <TableCaption>חפשו את מוסד הלימודים שלכם</TableCaption>
-              </div>
-              <div id="schoolSearch" ref={searchRef} className="scroll-mt-16">
-                <SchoolSelect
-                  schools={schools}
-                  selectedId={selectedId}
-                  onSelectId={onSelectSchool}
-                />
+    <div>
+      {/* Nothing chosen yet, so the search is the call to action and gets a band
+          of the hero's own pale blue. The search cannot be moved above the fold
+          without breaking the editorial composition, so the strongest lever left
+          is contrast of region: the reader comes out of the hero's blue straight
+          into blue and reads the two as one zone, rather than as the start of
+          the white document. Once a school is chosen the search becomes a
+          control rather than an invitation, and drops back to the plain card
+          beside the results. */}
+      {!selectedSchool && (
+        <section className="bg-hero-mist">
+          <div className={cn(containerGutters, mainContentGutters, 'py-10 sm:py-14')}>
+            <div className="w-full flex justify-center">
+              <div className="w-full max-w-2xl">
+                <div className="text-center mb-6 sm:mb-8">
+                  <SectionCta>חפשו את מוסד הלימודים שלכם</SectionCta>
+                  <p className="mt-3 font-text text-base text-ink/70 md:text-lg">
+                    הקלידו שם מוסד או יישוב, וראו אילו כבישים סביבו מסוכנים
+                  </p>
+                </div>
+                <div id="schoolSearch" ref={searchRef} className="scroll-mt-16">
+                  <SchoolSelect
+                    schools={schools}
+                    selectedId={selectedId}
+                    onSelectId={onSelectSchool}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        ) : (
-          // When school is selected - original layout
-          <div className="flex flex-col lg:flex-row gap-6 mb-16">
-            <div className="lg:w-[36%] w-full">
-              <div
-                id="schoolSearch"
-                ref={searchRef}
-                className="rounded-lg border border-neutral-200/70 p-3 mb-3 scroll-mt-16"
-              >
-                <SchoolSelect
-                  schools={schools}
-                  selectedId={selectedId}
-                  onSelectId={onSelectSchool}
-                />
-              </div>
-              {selectedSchool && (
+        </section>
+      )}
+
+      <div className={containerSpacing}>
+        {/* scroll-mt keeps the sticky header from covering this block when the
+            sticky search scrolls back to it */}
+        {selectedSchool && (
+          <div ref={resultsRef} className={cn(mainContentSpacing, 'scroll-mt-16')}>
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="lg:w-[36%] w-full">
+                <div
+                  id="schoolSearch"
+                  ref={searchRef}
+                  className="rounded-lg border border-neutral-200/70 p-3 mb-3 scroll-mt-16"
+                >
+                  <SchoolSelect
+                    schools={schools}
+                    selectedId={selectedId}
+                    onSelectId={onSelectSchool}
+                  />
+                </div>
                 <div
                   ref={statsRef}
                   className="rounded-lg border border-neutral-200/70 p-3 scroll-mt-16"
@@ -208,32 +227,32 @@ export const Report: React.FC<Props> = ({
                     genderStats={genderStats}
                   />
                 </div>
-              )}
-            </div>
-            <div className="lg:flex-1 w-full">
-              {selectedSchool && <Map school={selectedSchool} schoolId={selectedId} />}
+              </div>
+              <div className="lg:flex-1 w-full">
+                <Map school={selectedSchool} schoolId={selectedId} />
+              </div>
             </div>
           </div>
         )}
-      </div>
 
-      <div className={mainContentSpacing}>
-        <ReportArticle />
-      </div>
+        <div className={mainContentSpacing}>
+          <ReportArticle />
+        </div>
 
-      <div className={mainContentSpacing}>
-        <MapEmbed />
-      </div>
+        <div className={mainContentSpacing}>
+          <MapEmbed />
+        </div>
 
-      <div className={mainContentSpacing}>
-        <TopCitiesTable />
-        <MunicipalityTable />
-        <EducationalClustersTable />
-        <TransportationStats />
-        <VisionZero />
-      </div>
+        <div className={mainContentSpacing}>
+          <TopCitiesTable />
+          <MunicipalityTable />
+          <EducationalClustersTable />
+          <TransportationStats />
+          <VisionZero />
+        </div>
 
-      <FooterContent />
+        <FooterContent />
+      </div>
     </div>
   )
 }

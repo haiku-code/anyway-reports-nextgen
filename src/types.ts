@@ -25,6 +25,21 @@ export type ParsePart = {
   highlight: boolean
 }
 
+// How far the "find an institution near me" request has got. Every state except
+// Idle and Ready has a line of copy in lib/geoStatus.ts; Ready says nothing
+// because the panel of nearby institutions is the answer.
+// Const object rather than a TS enum for the erasableSyntaxOnly reason above.
+export const GeolocationStatus = {
+  Idle: 'idle',
+  Locating: 'locating',
+  Ready: 'ready',
+  Denied: 'denied',
+  Unavailable: 'unavailable',
+  Error: 'error',
+} as const
+
+export type GeolocationStatus = (typeof GeolocationStatus)[keyof typeof GeolocationStatus]
+
 export type School = {
   school_id: number
   school_name: string

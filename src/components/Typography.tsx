@@ -2,7 +2,7 @@ import React from 'react'
 import { cn } from '../lib/utils'
 
 export interface TypographyProps {
-  variant: 'hero-title' | 'hero-subtitle' | 'main-content' | 'table-header' | 'table-body' | 'table-caption'
+  variant: 'hero-title' | 'hero-subtitle' | 'section-cta' | 'main-content' | 'table-header' | 'table-body' | 'table-caption'
   children: React.ReactNode
   className?: string
   as?: React.ElementType
@@ -24,6 +24,13 @@ export const Typography: React.FC<TypographyProps> = ({
     'hero-subtitle': {
       mobile: "text-[18px] leading-[1.4] tracking-[-0.005em] font-[470] font-['Moses_Display']",
       desktop: "md:text-[23px]"
+    },
+    // The one call to action on the page. Sits between the hero title and the
+    // table captions on purpose: it has to outrank every heading below it
+    // without competing with the headline above it.
+    'section-cta': {
+      mobile: "text-[28px] leading-[1.1] tracking-[-0.01em] font-[640]",
+      desktop: "md:text-[44px]"
     },
     'main-content': {
       mobile: "text-[20px] leading-[1.5] tracking-[-0.005em] font-[400]",
@@ -67,6 +74,10 @@ export const HeroTitle: React.FC<{ children: React.ReactNode; className?: string
 
 export const HeroSubtitle: React.FC<{ children: React.ReactNode; className?: string }> = (props) => (
   <Typography variant="hero-subtitle" as="p" {...props} />
+)
+
+export const SectionCta: React.FC<{ children: React.ReactNode; className?: string }> = (props) => (
+  <Typography variant="section-cta" as="h2" {...props} />
 )
 
 export const MainContent: React.FC<{ children: React.ReactNode; className?: string }> = (props) => (
