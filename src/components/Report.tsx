@@ -47,7 +47,7 @@ const FooterContent: React.FC = () => {
               <div className="flex flex-col md:flex-row md:flex-wrap justify-center gap-x-2 gap-y-1">
                 <div className="flex justify-center md:inline">
                   <span>
-                    פיתוח והטמעה: <strong>יובל בר לוי</strong>
+                    פיתוח והטמעה: <strong>יובל בר לוי</strong> ו<strong>הדר חוברה</strong>
                   </span>
                 </div>
                 <div className="hidden md:inline">
