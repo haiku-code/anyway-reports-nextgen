@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import type { School } from '../types'
 import { getCityName } from '../lib/school'
 import { SchoolMarkerPin } from './SchoolMarkerPin'
+import { MAP_BASE_URL, MAP_EMBED_FILTERS } from '../constants/map'
 
 type Props = {
   school: School
@@ -9,13 +10,8 @@ type Props = {
 }
 
 function getLink(school: School, simpleView: boolean) {
-  const lat = school.latitude
-  const long = school.longitude
-  let link = `https://www.anyway.co.il/?zoom=17&lat=${lat}&lon=${long}`
-  if (simpleView) {
-    link = `${link}&start_date=2020-06-01&end_date=2025-05-31&show_fatal=1&show_severe=1&show_light=1&approx=1&accurate=1&show_markers=1&show_discussions=&show_urban=3&show_intersection=3&show_lane=3&show_day=7&show_holiday=0&show_time=24&start_time=7&end_time=19&weather=0&road=0&separation=0&surface=0&acctype=0&controlmeasure=0&district=0&case_type=0&show_rsa=0&age_groups=234&hide_search=true&map_only=true&hide_search=true`
-  }
-  return link
+  const base = `${MAP_BASE_URL}?zoom=17&lat=${school.latitude}&lon=${school.longitude}`
+  return simpleView ? `${base}&${MAP_EMBED_FILTERS}` : base
 }
 
 export const Map: React.FC<Props> = ({ school }) => {
