@@ -57,8 +57,8 @@ export const ReportArticle: React.FC = () => {
             בראשית הדף
           </a>
           ). בטבלאות מטה תוכלו לראות גם את השינוי בערים עצמן, ולהשוות בין{' '}
-          <span className="whitespace-nowrap">2015-2020</span> ל-
-          <span className="whitespace-nowrap">2020-2025</span>:
+          <span className="whitespace-nowrap">2021-2026</span> ל-
+          <span className="whitespace-nowrap">2016-2021</span>:
         </MainContent>
       </div>
     </div>
