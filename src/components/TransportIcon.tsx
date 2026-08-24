@@ -31,6 +31,17 @@ const BIKE_FRAME = (
 // inside it, where at that size it silted up into the tubes it crossed.
 const BOLT_ABOVE_FRAME = 'M13.4 2.6 11 6.5h1.7l-.7 2.7 2.6-4h-1.7z'
 
+// Two wheels, a deck and a T stem. Shared for the same reason BIKE_FRAME is:
+// the only thing separating קורקינט from קורקינט חשמלי is the bolt, and the
+// pair has to stay identical everywhere else for that to read.
+const SCOOTER_FRAME = (
+  <>
+    <circle cx="5" cy="18" r="2.5" />
+    <circle cx="18" cy="18" r="2.5" />
+    <path d="M7.5 18h8M15.5 18 17.4 8M15.4 7.5h4" />
+  </>
+)
+
 const PATHS: Record<TransportMode, React.ReactNode> = {
   [TransportMode.Pedestrian]: (
     <>
@@ -47,14 +58,13 @@ const PATHS: Record<TransportMode, React.ReactNode> = {
   ),
   [TransportMode.EScooter]: (
     <>
-      <circle cx="5" cy="18" r="2.5" />
-      <circle cx="18" cy="18" r="2.5" />
-      <path d="M7.5 18h8M15.5 18 17.4 8M15.4 7.5h4" />
+      {SCOOTER_FRAME}
       {/* Over the deck, which is the empty part of a scooter, so this one needs
           no clearance the way the bike's does. */}
       <path d="M10.4 9.4 8 13.4h1.8l-.7 3 2.7-4.2h-1.9z" fill="currentColor" stroke="none" />
     </>
   ),
+  [TransportMode.Scooter]: SCOOTER_FRAME,
 }
 
 export const TransportIcon: React.FC<Props> = ({ mode, className }) => (

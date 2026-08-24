@@ -1,23 +1,34 @@
 import { useState } from 'react'
-import { TRANSPORTATION_MODES, TRANSPORTATION_PERIODS } from '../constants/transportationStats'
-import { toDelta } from '../lib/transportationTrend'
+import { REPORT_PERIODS } from '../data/periods'
+import { TRANSPORTATION_MODES } from '../data/transportation'
 import { TransportMode } from '../types'
 import CasualtyOverviewCard from './CasualtyOverviewCard'
 import TransportationModeCard from './TransportationModeCard'
 import Typography, { TableCaption } from './Typography'
 
-// The finding the section exists for. Both figures are read off the data rather
-// than written into the copy, so the sentence cannot drift from the cards under
-// it if a number is ever corrected.
-const scooter = TRANSPORTATION_MODES[0]
-const scooterTotalRise = toDelta(
-  scooter.period2020_2025.totalInjured,
-  scooter.period2015_2020.totalInjured
-).percent
-const scooterSevereRise = toDelta(
-  scooter.period2020_2025.severeInjuries,
-  scooter.period2015_2020.severeInjuries
-).percent
+// The finding the section exists for. Looked up by id rather than taken from
+// index 0: the order of TRANSPORTATION_MODES comes from the export now, and
+// nothing guarantees which row leads it.
+//
+// Wrapped in a function so the rest of the module binds the checked row. A bare
+// `if (row === undefined) throw` narrows only the module body, and the
+// component below is a closure, where the narrowing does not reach.
+function leadMode() {
+  const row = TRANSPORTATION_MODES.find((mode) => mode.id === TransportMode.EScooter)
+  if (row === undefined) {
+    throw new Error(
+      'TRANSPORTATION_MODES is missing the electric scooter row the section leads with'
+    )
+  }
+  return row
+}
+
+const scooter = leadMode()
+
+// Read off the data rather than written into the copy, so the sentence cannot
+// drift from the cards under it if a number is ever corrected.
+const scooterTotalRise = scooter.changes.totalInjured
+const scooterSevereRise = scooter.changes.severeInjuries
 
 export default function TransportationStats() {
   // Independent rather than single-open: the panels are one line each, and
@@ -42,8 +53,8 @@ export default function TransportationStats() {
       >
         <TableCaption className="text-center">נפגעים בסביבת מוסדות לימוד</TableCaption>
         <Typography variant="table-body" className="mt-1 text-center text-gray-600">
-          השוואה בין התקופות: <span dir="ltr">{TRANSPORTATION_PERIODS.previous}</span> מול{' '}
-          <span dir="ltr">{TRANSPORTATION_PERIODS.current}</span>
+          השוואה בין התקופות: <span dir="ltr">{REPORT_PERIODS.previous}</span> מול{' '}
+          <span dir="ltr">{REPORT_PERIODS.current}</span>
         </Typography>
       </div>
 
@@ -53,10 +64,11 @@ export default function TransportationStats() {
             From lg the cards go four across and the section takes the full
             width, because that is what lets a reader compare the modes. */}
         <div className="mx-auto max-w-[560px] lg:max-w-none">
-          {/* The two summaries share a row once there is width for it. They are
-              a pair: the overview says casualties fell, the alert says which
-              mode is the exception, and side by side that reads as one thought
-              rather than two stacked announcements. */}
+          {/* The two summaries share a row once there is width for it. They
+              are a pair: the overview gives the scale of the rise across
+              every mode, the alert says which mode is driving it, and side by
+              side that reads as one thought rather than two stacked
+              announcements. */}
           <div className="lg:mb-5 lg:grid lg:grid-cols-2 lg:gap-4">
             {/* Wide screens only. Narrow ones show this card up in the article,
                 rendered from the same component. Swapped with responsive classes
@@ -109,16 +121,19 @@ export default function TransportationStats() {
             פילוח לפי אמצעי תחבורה
           </Typography>
 
-          {/* Two across at lg, four only at xl. The page container caps this
-              section at 809px on a 1024px screen, which leaves 185px per card
-              in a four-column row: narrower than the 195px a severity row needs,
-              so the text overflowed and the rows stopped lining up. Four across
-              is the point of the layout, so it waits for the width that lets it
-              work rather than being served broken.
+          {/* Three across from lg, and no five across row at any width. Five
+              cards would be the tidier grid, but a card needs about 230px to
+              keep a severity row on one line, and this page never reliably
+              offers that in a five column row: the container is 1055px at
+              1280px and 863px at 1536px, where 2xl:px-72 takes 576px of the
+              viewport away, so five across wraps ten of the fifteen severity
+              rows at both. It only clears at roughly 1890px and up. Three
+              across measures clean at every width from 1024px, so the section
+              is served whole rather than broken between 1280px and 1890px.
 
               items-stretch is what makes the panels a set rather than loose
               cards: equal height, so their bottom rows share a line. */}
-          <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:items-stretch xl:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:items-stretch">
             {TRANSPORTATION_MODES.map((stats) => (
               <TransportationModeCard
                 key={stats.id}

@@ -31,3 +31,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Source emails. Kept on disk as the original, never committed: they carry
+# the recipients personal addresses, and the CSVs they contain are checked in
+# under data/source/ instead.
+*.eml

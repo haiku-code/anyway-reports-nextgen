@@ -19,9 +19,13 @@ a static Vite build with no backend of its own.
 | `npm run deploy:prod` | Build production and deploy to Netlify                                |
 | `npm run lint`        | ESLint, `--max-warnings=0`                                            |
 | `npm run format`      | Prettier over the repo                                                |
+| `npm run data:build`  | Regenerate `src/data/` from `data/source/`, then verify it            |
+| `npm run data:test`   | Unit tests for the pipeline's parsing helpers (`node:test`)           |
 
-There is no test framework and no `test` script. Verification here means
-building and asserting on `dist/` output, or checking the deployed URL.
+There is no test framework for the app and no `test` script. Verification of
+the app means building and asserting on `dist/` output, or checking the
+deployed URL. The data pipeline's parsing helpers are the exception: they are
+covered by `node:test` and run with `npm run data:test`.
 
 `npm run lint` currently fails on two pre-existing `react/no-unescaped-entities`
 errors in `src/components/Hero.tsx`. Do not treat that as a regression you
@@ -92,16 +96,27 @@ directly inside components, no client layer or caching:
 
 These feed the interactive top section (`SchoolSelect`, `Stats`, `Map`).
 
-**2. Hardcoded datasets, transcribed from a printed PDF report.** The aggregate
-tables below the interactive section do not call any API. Each component
-declares its own dataset as a `const` array at the top of its own file:
-`TopCitiesTable`, `MunicipalityTable`, `EducationalClustersTable`,
-`TransportationStats`, plus `src/constants/visionZero.ts`.
+**2. Generated datasets, built from committed CSV exports.** The aggregate
+tables below the interactive section do not call any API. Their numbers are
+generated into `src/data/` by the pipeline in `scripts/data/`, which reads the
+CSVs in `data/source/<edition>/`, asserts everything it can check, and emits
+`.ts` modules ending in a `satisfies` against a type in `src/types.ts`. Run it
+with `npm run data:build`.
 
-When a number in one of those tables is wrong, the fix is editing the literal in
-that component, not chasing an API. Their shapes are typed in `src/types.ts`
-(`CityRanking`, `MunicipalityComparison`, `EducationalCluster`,
-`TransportationModeStats`).
+`src/data/` is committed and never hand edited: `netlify.toml` runs only
+`npm run build`, so the pipeline does not run on the build server, and the next
+`data:build` overwrites anything typed into a generated file. A wrong number is
+fixed in the CSV or in the builder.
+
+`TopCitiesTable`, `MunicipalityTable`, `TransportationStats` and
+`CasualtyOverviewCard` read from `src/data/`. `EducationalClustersTable` and
+`src/constants/visionZero.ts` are still hand transcribed literals; when a number
+in one of those is wrong, that literal is the fix.
+
+Percentages are carried from the exports as text rather than recomputed, so the
+page prints exactly what the source published. `scripts/data/verify.ts`
+recomputes all of them from the counts and fails the run on a disagreement. See
+`docs/superpowers/plans/2026-08-24-csv-data-pipeline.md` for why.
 
 ### Presentation
 

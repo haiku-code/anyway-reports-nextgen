@@ -1,27 +1,9 @@
 import React from 'react'
-import { TRANSPORTATION_TOTALS } from '../constants/transportationStats'
-import { formatCount, toDelta, toSevereOrKilled } from '../lib/transportationTrend'
+import { REPORT_SUMMARY } from '../data/summary'
+import { formatCount, toDelta } from '../lib/transportationTrend'
 import { cn } from '../lib/utils'
 import TrendPill from './TrendPill'
 import Typography from './Typography'
-
-const { period2015_2020: totalsBefore, period2020_2025: totalsAfter } = TRANSPORTATION_TOTALS
-
-// The two figures this card opens on. Total casualties fell, yet the count of
-// people killed or badly hurt rose: one number on its own tells the wrong
-// story, so they are printed side by side and the reader gets both at once.
-const OVERVIEW = [
-  {
-    label: 'סה״כ נפגעים',
-    value: totalsAfter.totalInjured,
-    delta: toDelta(totalsAfter.totalInjured, totalsBefore.totalInjured),
-  },
-  {
-    label: 'פצועים קשה + הרוגים',
-    value: toSevereOrKilled(totalsAfter),
-    delta: toDelta(toSevereOrKilled(totalsAfter), toSevereOrKilled(totalsBefore)),
-  },
-]
 
 type Props = {
   className?: string
@@ -31,6 +13,9 @@ type Props = {
 // article on narrow screens, and at the head of the transport breakdown on wide
 // ones. Only one is ever displayed. The caller passes the visibility, so this
 // file does not have to know which of the two placements it is.
+//
+// Both figures rose this edition: more people hurt, and a larger share of them
+// badly. Printed side by side because either one alone tells half the story.
 export const CasualtyOverviewCard: React.FC<Props> = ({ className }) => (
   <div className={cn('rounded-lg border border-gray-200 p-4', className)}>
     <Typography
@@ -40,21 +25,21 @@ export const CasualtyOverviewCard: React.FC<Props> = ({ className }) => (
       מבט על · סה״כ נפגעים מכל הסוגים
     </Typography>
     <dl className="grid grid-cols-2 gap-3">
-      {OVERVIEW.map((item) => (
-        <div key={item.label} className="text-center">
+      {REPORT_SUMMARY.map((figure) => (
+        <div key={figure.label} className="text-center">
           <dt>
             <Typography variant="table-body" as="span" className="text-gray-600">
-              {item.label}
+              {figure.label}
             </Typography>
           </dt>
           <dd>
             {/* Proportional figures, not tabular. Nothing here lines up into a
                 column, and Moses Text's tabular set gives the thousands comma a
-                full digit advance, which opens 6,260 into "6 , 260". */}
+                full digit advance, which opens 6,690 into "6 , 690". */}
             <span className="my-2 block font-text text-[32px] leading-none font-extrabold text-gray-800">
-              {formatCount(item.value)}
+              {formatCount(figure.value)}
             </span>
-            <TrendPill delta={item.delta} />
+            <TrendPill delta={toDelta(figure.change)} />
           </dd>
         </div>
       ))}

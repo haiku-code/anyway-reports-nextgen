@@ -26,8 +26,8 @@ type Props = {
 // all four, which is what the fixed header height, the stacked severities and
 // the bottom-pinned previous-period row are for.
 export const TransportationModeCard: React.FC<Props> = ({ stats, expanded, onToggle }) => {
-  const { period2015_2020: before, period2020_2025: after } = stats
-  const totalDelta = toDelta(after.totalInjured, before.totalInjured)
+  const { previousPeriod: before, currentPeriod: after, changes } = stats
+  const totalDelta = toDelta(changes.totalInjured)
   const panelId = `transport-${stats.id}-previous`
 
   return (
@@ -79,7 +79,7 @@ export const TransportationModeCard: React.FC<Props> = ({ stats, expanded, onTog
               <span className="my-1.5 block font-text text-[20px] leading-none font-extrabold text-gray-800 xl:my-0 xl:inline-block">
                 {formatCount(after[key])}
               </span>
-              <TrendPill delta={toDelta(after[key], before[key])} size={TrendPillSize.Compact} />
+              <TrendPill delta={toDelta(changes[key])} size={TrendPillSize.Compact} />
             </dd>
           </div>
         ))}
