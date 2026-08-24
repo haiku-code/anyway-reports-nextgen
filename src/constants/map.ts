@@ -26,8 +26,8 @@ const ALL_ACCIDENT_TYPES = 1
 const SCHOOL_AGE_GROUPS = 234
 
 export const MAP_EMBED_FILTERS = [
-  'start_date=2020-06-01',
-  'end_date=2025-05-31',
+  'start_date=2021-06-01',
+  'end_date=2026-05-31',
   'show_fatal=1',
   'show_severe=1',
   'show_light=1',

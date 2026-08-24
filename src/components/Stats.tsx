@@ -5,7 +5,7 @@ import { Graph } from './Graph'
 import { GenderSplitBar } from './GenderSplitBar'
 import type { InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
-const years = ['2020', '2021', '2022', '2023', '2024', '2025'] as const
+const years = ['2021', '2022', '2023', '2024', '2025', '2026'] as const
 const HEBREW_MONTHS = [
   'ינואר',
   'פברואר',
@@ -44,14 +44,7 @@ function severityStatsByYear(
     type: 'line' as const,
     name,
     color,
-    data: [
-      getFromStatsByYear(stats, 2020, severity),
-      getFromStatsByYear(stats, 2021, severity),
-      getFromStatsByYear(stats, 2022, severity),
-      getFromStatsByYear(stats, 2023, severity),
-      getFromStatsByYear(stats, 2024, severity),
-      getFromStatsByYear(stats, 2025, severity),
-    ],
+    data: years.map((year) => getFromStatsByYear(stats, Number(year), severity)),
     key: `${name}-${severity}`,
   }
 }
@@ -180,7 +173,11 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
         </section>
       )}
 
-      {monthStats && (
+      {/* the new-cbs-format build answers the months endpoint with an empty
+          array for every school, so an unguarded render would draw twelve empty
+          bars and read as "no accidents all year". length check, same as the
+          gender section below, so the heading goes away with the data. */}
+      {monthStats && monthStats.length > 0 && (
         <section>
           <div className="text-base font-semibold mb-1">נפגעים לפי חודש</div>
           <Graph options={column} />

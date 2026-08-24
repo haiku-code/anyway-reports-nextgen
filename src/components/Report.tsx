@@ -14,6 +14,11 @@ import orYarokLogo from '../assets/or_yarok_logo.avif'
 import natunLogo from '../assets/natun_leshinuy_logo.png'
 import haikuLogo from '../assets/haiku_logo.svg'
 import { cn } from '../lib/utils'
+import {
+  injuredAroundSchoolsUrl,
+  injuredAroundSchoolsMonthsUrl,
+  injuredAroundSchoolsSexUrl,
+} from '../constants/api'
 
 import type { School, InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
@@ -160,19 +165,13 @@ export const Report: React.FC<Props> = ({
   useEffect(() => {
     if (selectedId && selectedId !== 0) {
       axios
-        .get<
-          InjuredYearRecord[]
-        >(`https://www.anyway.co.il/api/injured-around-schools?school_id=${selectedId}`)
+        .get<InjuredYearRecord[]>(injuredAroundSchoolsUrl(selectedId))
         .then((res) => setInjuredStats(res.data))
       axios
-        .get<
-          MonthlyRecord[]
-        >(`https://www.anyway.co.il/api/injured-around-schools-months-graphs-data?school_id=${selectedId}`)
+        .get<MonthlyRecord[]>(injuredAroundSchoolsMonthsUrl(selectedId))
         .then((res) => setMonthStats(res.data))
       axios
-        .get<
-          SexRecord[]
-        >(`https://www.anyway.co.il/api/injured-around-schools-sex-graphs-data?school_id=${selectedId}`)
+        .get<SexRecord[]>(injuredAroundSchoolsSexUrl(selectedId))
         .then((res) => setGenderStats(res.data))
     }
   }, [selectedId])

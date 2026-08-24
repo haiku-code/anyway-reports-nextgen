@@ -6,6 +6,7 @@ import { Report } from './components/Report'
 import { useIsScrolledPast } from './hooks/useIsScrolledPast'
 import { scrollBehavior } from './lib/motion'
 import { isMobileViewport } from './lib/viewport'
+import { SCHOOLS_NAMES_URL } from './constants/api'
 import type { School } from './types'
 
 export const App: React.FC = () => {
@@ -21,9 +22,7 @@ export const App: React.FC = () => {
   const isSearchScrolledPast = useIsScrolledPast(searchElement)
 
   useEffect(() => {
-    axios
-      .get<School[]>('https://www.anyway.co.il/api/schools-names')
-      .then((res) => setSchools(res.data))
+    axios.get<School[]>(SCHOOLS_NAMES_URL).then((res) => setSchools(res.data))
   }, [])
 
   // Takes the reader to what they just searched for. Keyed on selectedId so the

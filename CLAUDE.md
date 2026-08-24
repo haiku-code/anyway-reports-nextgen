@@ -85,8 +85,10 @@ flows down through `Report.tsx` as props.
 This is the single most important thing to understand before editing a
 component.
 
-**1. Live API, per-school.** `anyway.co.il` endpoints, called with axios
-directly inside components, no client layer or caching:
+**1. Live API, per-school.** anyway endpoints, called with axios directly inside
+components. There is no client layer and no caching; the only shared piece is
+`src/constants/api.ts`, which holds the host and one URL builder per endpoint so
+the host is written once.
 
 - `App.tsx` fetches `/api/schools-names` once on mount.
 - `Report.tsx` fetches three endpoints whenever `selectedId` changes:
@@ -95,6 +97,105 @@ directly inside components, no client layer or caching:
   `/api/injured-around-schools-sex-graphs-data`.
 
 These feed the interactive top section (`SchoolSelect`, `Stats`, `Map`).
+
+#### Which anyway build to point at
+
+anyway runs two deployments of the same server
+([`data-for-change/anyway`](https://github.com/data-for-change/anyway)):
+`www.anyway.co.il` on `master` and `www.dfc2.anyway.co.il` on `new-cbs-format`.
+
+Everything in this app points at **dfc2**, and that is not a preference. www
+serves accident years 2020 through 2025; dfc2 serves 2021 through 2026. Only
+dfc2 matches the edition this report is written against, so `API_BASE_URL` in
+`src/constants/api.ts` and `MAP_BASE_URL` in `src/constants/map.ts` have to name
+the same host. Splitting them puts the map and the numbers printed beside it on
+different editions of the data.
+
+The partial years at each end of dfc2's range sum to about one full year, which
+puts its real window at June 2021 to May 2026. That is where the
+`start_date=2021-06-01` and `end_date=2026-05-31` in `MAP_EMBED_FILTERS` come
+from, and why `years` in `Stats.tsx` runs 2021 to 2026. Those three values move
+together or not at all.
+
+#### The endpoints are S3 dumps, not queries
+
+`anyway/views/schools/api.py` on the server does not query the database for any
+of these four routes. It reads four precomputed JSON files out of the S3 bucket
+`dfc-anyway` under `schools_report/output/`, keyed by school id as a string, and
+returns one entry. Two consequences:
+
+- The route being reachable says nothing about the data behind it being
+  populated. A stale or bad export is invisible from the outside except as
+  wrong or empty content.
+- The lookup is `all_data[school_id]` with no default, so any id not in the
+  file is a **500**, not a 404 or an empty list. Ids come from
+  `/api/schools-names`, so normal use never hits it, but nothing in
+  `Report.tsx` catches these rejections either.
+
+`schools_names.json` is written by `anyway/parsers/schools_with_description.py`.
+The other three files come from a Jupyter notebook, one per edition, in
+`anyway/parsers/`: `schools_2022.ipynb` through `schools_2024.ipynb`, and for
+this edition `schools_2025_empty_output.ipynb`. The notebook reads 5,607
+per-school CSVs, aggregates them, writes the three JSON files and uploads them
+straight to `schools_report/output/`, overwriting what the API serves. So these
+files are reproducible from the repo, but only by rerunning a notebook by hand
+against inputs that are not in it.
+
+The schools API is **byte-identical on both branches**. So any difference in
+what www and dfc2 answer is a difference in the S3 files or in what each
+process has cached, never a difference in code. `load_school_file_from_s3` is
+wrapped in a bare `@lru_cache`, with no TTL, so each worker reads a file once
+and then serves that copy until it restarts. A build can therefore answer with
+data that no longer exists in S3.
+
+#### Known gap: the monthly chart has no data on dfc2
+
+`/api/injured-around-schools-months-graphs-data` answers `200` with `[]` for
+every school on dfc2, checked against 250 of them. The route is fine; the
+export behind it is empty, and the notebook above shows why.
+
+The notebook builds the months file and the sex file with the same code shape:
+group by `school_id` plus one label column, count, bucket per school. The sex
+file is correct and the months file is empty, and the only thing that differs
+is the label column. `sex_hebrew` arrives from the CSVs ready to use.
+`accident_month_hebrew` is derived, in a single line:
+
+```python
+df['accident_month_hebrew'] = df['accident_month'].apply(lambda m: months_dict.get(m))
+```
+
+`months_dict` is keyed by the integers 1 to 12. A `.get` miss returns `None`
+rather than raising, and pandas `groupby` drops `None` keys by default, so if
+`accident_month` does not arrive from `pd.read_csv` as a number, every row maps
+to `None`, the grouping produces zero rows, and all 5,607 schools get `[]`. The
+column has to exist, or that line would raise, so the value type is what
+changed in the new CBS format. Nothing in the notebook asserts the mapping
+worked, which is why this shipped silently, and why the file is named
+`schools_2025_empty_output.ipynb`.
+
+That is anyway's fix, in their notebook, not ours. Reporting it is more useful
+than working around it.
+
+Do not "fix" the chart by pointing that one call at www either. It would print
+June 2020 to May 2025 months beside June 2021 to May 2026 yearly figures, and
+www's copy is a cached pre-2026 file, so it would break with no warning at the
+next restart. Note that www serving the whole old file set, 2020 to 2025 with
+working months, while dfc2 serves the whole new set, is exactly what the
+`lru_cache` predicts: the notebook overwrote every file at once, and only dfc2
+has reread them.
+
+`Stats.tsx` guards the section with `monthStats.length > 0` rather than a bare
+truthiness check, because `[]` is truthy and an unguarded render draws twelve
+empty bars that read as "no accidents all year". While the export is empty the
+heading and chart are simply absent, and they come back on their own once it is
+fixed, with no code change.
+
+#### When testing these endpoints by hand
+
+These routes intermittently answer with a schema summary rather than data, like
+`[{accident_year: int, ...}] (3)`, which is not valid JSON and will crash a
+parser. It is not tied to any request header worth chasing. Retry the request
+until it parses instead of concluding the endpoint is broken or empty.
 
 **2. Generated datasets, built from committed CSV exports.** The aggregate
 tables below the interactive section do not call any API. Their numbers are
