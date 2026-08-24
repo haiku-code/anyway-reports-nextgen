@@ -7,7 +7,6 @@ import { VisionZero } from './VisionZero'
 import MunicipalityTable from './MunicipalityTable'
 import TopCitiesTable from './TopCitiesTable'
 import TransportationStats from './TransportationStats'
-import EducationalClustersTable from './EducationalClustersTable'
 import { ReportArticle } from './ReportArticle'
 import { MapEmbed } from './MapEmbed'
 import { SectionCta } from './Typography'
@@ -262,7 +261,8 @@ export const Report: React.FC<Props> = ({
         <div className={mainContentSpacing}>
           <TopCitiesTable />
           <MunicipalityTable />
-          <EducationalClustersTable />
+          {/* Commented out because it's not relevant to the report, leaving it here for future reference */}
+          {/* <EducationalClustersTable /> */}
           <TransportationStats />
           <VisionZero />
         </div>
