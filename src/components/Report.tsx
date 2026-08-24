@@ -11,6 +11,7 @@ import EducationalClustersTable from './EducationalClustersTable'
 import { ReportArticle } from './ReportArticle'
 import { MapEmbed } from './MapEmbed'
 import { SectionCta } from './Typography'
+import orYarokLogo from '../assets/or_yarok_logo.avif'
 import natunLogo from '../assets/natun_leshinuy_logo.png'
 import haikuLogo from '../assets/haiku_logo.svg'
 import { cn } from '../lib/utils'
@@ -93,6 +94,21 @@ const FooterContent: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-row justify-center items-center gap-3 sm:gap-4 md:gap-8 mb-8">
+            <div className="text-center">
+              <a
+                href="https://www.oryarok.org.il"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block hover:opacity-80 transition-opacity duration-200"
+              >
+                <img
+                  src={orYarokLogo}
+                  alt="אור ירוק"
+                  className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain"
+                />
+              </a>
+            </div>
+
             <div className="text-center">
               <a
                 href="https://www.natoon.co.il"
