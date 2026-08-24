@@ -3,39 +3,16 @@ import { REPORT_PERIODS } from '../data/periods'
 import { TRANSPORTATION_MODES } from '../data/transportation'
 import { TransportMode } from '../types'
 import CasualtyOverviewCard from './CasualtyOverviewCard'
+import KeyFindingsPanel from './KeyFindingsPanel'
 import TransportationModeCard from './TransportationModeCard'
 import Typography, { TableCaption } from './Typography'
-
-// The finding the section exists for. Looked up by id rather than taken from
-// index 0: the order of TRANSPORTATION_MODES comes from the export now, and
-// nothing guarantees which row leads it.
-//
-// Wrapped in a function so the rest of the module binds the checked row. A bare
-// `if (row === undefined) throw` narrows only the module body, and the
-// component below is a closure, where the narrowing does not reach.
-function leadMode() {
-  const row = TRANSPORTATION_MODES.find((mode) => mode.id === TransportMode.EScooter)
-  if (row === undefined) {
-    throw new Error(
-      'TRANSPORTATION_MODES is missing the electric scooter row the section leads with'
-    )
-  }
-  return row
-}
-
-const scooter = leadMode()
-
-// Read off the data rather than written into the copy, so the sentence cannot
-// drift from the cards under it if a number is ever corrected.
-const scooterTotalRise = scooter.changes.totalInjured
-const scooterSevereRise = scooter.changes.severeInjuries
 
 export default function TransportationStats() {
   // Independent rather than single-open: the panels are one line each, and
   // closing a card the reader opened earlier would shift everything below it
   // just as they arrive there. The scooter card starts open because it is the
-  // one whose previous-period counts explain the headline.
-  const [expanded, setExpanded] = useState<TransportMode[]>([scooter.id])
+  // one whose previous-period counts explain the headline finding.
+  const [expanded, setExpanded] = useState<TransportMode[]>([TransportMode.EScooter])
 
   const toggle = (mode: TransportMode) =>
     setExpanded((current) =>
@@ -66,8 +43,8 @@ export default function TransportationStats() {
         <div className="mx-auto max-w-[560px] lg:max-w-none">
           {/* The two summaries share a row once there is width for it. They
               are a pair: the overview gives the scale of the rise across
-              every mode, the alert says which mode is driving it, and side by
-              side that reads as one thought rather than two stacked
+              every mode, the findings say which modes are driving it, and side
+              by side that reads as one thought rather than two stacked
               announcements. */}
           <div className="lg:mb-5 lg:grid lg:grid-cols-2 lg:gap-4">
             {/* Wide screens only. Narrow ones show this card up in the article,
@@ -75,46 +52,13 @@ export default function TransportationStats() {
                 rather than a viewport hook, so there is no first-paint flash of
                 the wrong one, and display:none keeps the hidden copy out of the
                 accessibility tree rather than reading the figures out twice. */}
-            <CasualtyOverviewCard className="mb-3 hidden md:block lg:mb-0" />
+            {/* Centred rather than top-aligned: the grid stretches this card to
+                the findings panel's height, which is the taller of the two at
+                four findings, and its two figures would otherwise sit against
+                the top edge over a pool of empty white. */}
+            <CasualtyOverviewCard className="mb-3 hidden md:block lg:mb-0 lg:flex lg:flex-col lg:justify-center" />
 
-            {/* Fenced by a heavy edge on the side the text starts from as well
-                as tinted, so it reads as set apart from the cards even where the
-                tint does not survive. border-s, not border-r, so it stays on the
-                reading edge. */}
-            {/* Centred rather than top-aligned: the grid stretches this box to
-                the overview card's height, and its three lines of text would
-                otherwise sit against the top edge over a pool of empty tint. */}
-            <div className="mb-5 rounded-lg border border-gray-200 border-s-4 border-s-trend-up bg-trend-up-surface/50 p-4 lg:mb-0 lg:flex lg:flex-col lg:justify-center">
-              <Typography
-                variant="table-header"
-                className="mb-2 flex items-center gap-2 text-trend-up"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2.2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  className="size-5 shrink-0"
-                >
-                  <path d="m3 17 6-6 4 4 8-8m-6 0h6v6" />
-                </svg>
-                מגמת הזינוק · קורקינטים חשמליים
-              </Typography>
-              <Typography variant="table-body" as="p" className="leading-relaxed text-trend-up">
-                נרשמה עלייה חסרת תקדים של{' '}
-                <strong dir="ltr" className="font-bold">
-                  {scooterTotalRise}
-                </strong>{' '}
-                בסה״כ הנפגעים מקורקינטים חשמליים, וזינוק של{' '}
-                <strong dir="ltr" className="font-bold">
-                  {scooterSevereRise}
-                </strong>{' '}
-                במספר הפצועים קשה.
-              </Typography>
-            </div>
+            <KeyFindingsPanel className="mb-5 lg:mb-0" />
           </div>
 
           <Typography variant="table-header" className="mb-3 text-gray-700">
