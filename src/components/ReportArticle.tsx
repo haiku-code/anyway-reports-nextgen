@@ -1,5 +1,6 @@
 import React from 'react'
 import CasualtyOverviewCard from './CasualtyOverviewCard'
+import KeyFindingsPanel from './KeyFindingsPanel'
 import { MainContent } from './Typography'
 
 export const ReportArticle: React.FC = () => {
@@ -15,9 +16,21 @@ export const ReportArticle: React.FC = () => {
           המרכזית לסטטיסטיקה.
         </MainContent>
 
-        {/* Narrow screens only. On wide ones this card stays down in the
-            transport breakdown, where it heads the section it summarises. */}
-        <CasualtyOverviewCard className="md:hidden" />
+        {/* Narrow screens only. On wide ones both of these stay down in the
+            transport breakdown, where they head the section they summarise, and
+            sit side by side because there is width for it.
+
+            Here there is not, so they are stacked into a single card instead of
+            two: the overview gives the scale of the rise, the findings say what
+            is driving it, and a reader scrolling a phone should not have to
+            decide whether the second block is still about the first. The seam
+            is one hairline, drawn by the panel's own top border once the card
+            above drops its bottom one, and the corners are rounded only on the
+            outside of the pair. */}
+        <div className="md:hidden">
+          <CasualtyOverviewCard className="rounded-b-none border-b-0" />
+          <KeyFindingsPanel className="rounded-t-none" />
+        </div>
 
         <MainContent className="text-neutral-800">
           מתוך 6,690 הילדים ובני הנוער שנפגעו בסביבת הגנים ומוסדות החינוך ברחבי הארץ בחמש השנים

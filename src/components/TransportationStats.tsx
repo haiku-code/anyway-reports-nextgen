@@ -58,7 +58,10 @@ export default function TransportationStats() {
                 the top edge over a pool of empty white. */}
             <CasualtyOverviewCard className="mb-3 hidden md:block lg:mb-0 lg:flex lg:flex-col lg:justify-center" />
 
-            <KeyFindingsPanel className="mb-5 lg:mb-0" />
+            {/* Hidden on narrow screens for the same reason as the card above
+                it: there the two are joined into one block up in the article,
+                so leaving this copy here would print the findings twice. */}
+            <KeyFindingsPanel className="mb-5 hidden md:block lg:mb-0" />
           </div>
 
           <Typography variant="table-header" className="mb-3 text-gray-700">
