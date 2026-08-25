@@ -72,8 +72,8 @@ const KEY_FINDINGS: { id: string; text: React.ReactNode }[] = [
     text: (
       <>
         החמרה קיצונית בחומרת התאונות: מספר הנפגעים הכללי עלה ב-
-        <strong className={FIGURE}>3.7%</strong> בלבד, אך שיעור הנפגעים קשה וההרוגים זינק ב-
-        <strong className={FIGURE}>30.1%</strong>
+        <strong className={FIGURE}>3.67%</strong> בלבד, אך שיעור הנפגעים קשה וההרוגים זינק ב-
+        <strong className={FIGURE}>30%</strong>
       </>
     ),
   },
