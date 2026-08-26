@@ -3,7 +3,7 @@ import { HeroTitle, HeroSubtitle } from './Typography'
 
 export const Hero: React.FC = () => {
   return (
-    <section className="relative w-full h-[643px] md:h-[873px] overflow-hidden flex items-center justify-center text-center">
+    <section className="relative w-full h-[643px] md:h-[700px] overflow-hidden flex items-center justify-center text-center">
       <div
         className="absolute inset-0 bg-no-repeat bg-[size:auto_873px] bg-[position:-540px_bottom] md:bg-cover md:bg-center"
         style={{
@@ -11,7 +11,7 @@ export const Hero: React.FC = () => {
         }}
       >
         {/*
-          Desktop scrim. The hero is a fixed 873px there and the title never
+          Desktop scrim. The hero is a fixed 700px there and the title never
           wraps past three lines, so percentage stops over the whole section
           are stable.
         */}
@@ -43,7 +43,11 @@ export const Hero: React.FC = () => {
             style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}
           >
             <HeroSubtitle>
-              2,587,000 תלמידים וילדי גן יפתחו את שנת הלימודים ב-1/9. הם יחצו כבישים וצמתים בדרכם אל מוסדות הלימוד, בין אם ברגל, באופניים, בקורקינט או בכלי רכב חשמלי. ב-5 השנים האחרונות נפגעו 6,690 ילדים בדרכים הללו - שחלקן מסוכנות. ynet מציג את מפת ANYWAY מבית ׳נתון לשינוי׳ ובשיתוף עמותת ׳אור ירוק׳, שחושפת את אותם הכבישים: כתבו את שם המוסד החינוכי, גלו אותם במפה, הדריכו את ילדיכם או התריאו בפני הרשויות - והצילו חיים
+              2,611,000 תלמידים וילדי גן יפתחו את שנת הלימודים ב-1/9. הם יחצו כבישים וצמתים בדרכם אל
+              מוסדות הלימוד, בין אם ברגל, באופניים, בקורקינט או בכלי רכב חשמלי. ב-5 השנים האחרונות
+              נפגעו 6,690 ילדים בדרכים הללו - שחלקן מסוכנות. ynet מציג את מפת ANYWAY מבית ׳נתון
+              לשינוי׳ ובשיתוף עמותת ׳אור ירוק׳, שחושפת את אותם הכבישים: כתבו את שם המוסד החינוכי,
+              גלו אותם במפה, הדריכו את ילדיכם או התריאו בפני הרשויות - והצילו חיים
             </HeroSubtitle>
           </div>
 

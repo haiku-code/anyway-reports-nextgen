@@ -9,6 +9,7 @@ import TopCitiesTable from './TopCitiesTable'
 import TransportationStats from './TransportationStats'
 import { ReportArticle } from './ReportArticle'
 import { MapEmbed } from './MapEmbed'
+import { MapIntro } from './MapIntro'
 import { SectionCta } from './Typography'
 import orYarokLogo from '../assets/or_yarok_logo.avif'
 import natunLogo from '../assets/natun_leshinuy_logo.png'
@@ -69,14 +70,6 @@ const FooterContent: React.FC = () => {
                 <div className="flex justify-center md:inline">
                   <span>
                     עורך: <strong>אופיר שמיר</strong>
-                  </span>
-                </div>
-                <div className="hidden md:inline">
-                  <span>|</span>
-                </div>
-                <div className="flex justify-center md:inline">
-                  <span>
-                    ניהול פרויקט: <strong>ראיין קורנל</strong>
                   </span>
                 </div>
               </div>
@@ -253,8 +246,13 @@ export const Report: React.FC<Props> = ({
           <ReportArticle />
         </div>
 
-        <div className={mainContentSpacing}>
-          <MapEmbed />
+        {/* The breakdown reads before the map and the tables rather than after
+            them, on the editor's note that it is the block that orders the
+            page: it names the shift the rest of the section then details. Its
+            own wrapper carries only the gutters, because TransportationStats
+            already ends in mb-16 of its own. */}
+        <div className={mainContentGutters}>
+          <TransportationStats />
         </div>
 
         <div className={mainContentSpacing}>
@@ -262,7 +260,8 @@ export const Report: React.FC<Props> = ({
           <MunicipalityTable />
           {/* Commented out because it's not relevant to the report, leaving it here for future reference */}
           {/* <EducationalClustersTable /> */}
-          <TransportationStats />
+          <MapIntro />
+          <MapEmbed />
           <VisionZero />
         </div>
 
