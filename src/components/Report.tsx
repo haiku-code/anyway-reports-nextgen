@@ -93,14 +93,14 @@ const FooterContent: React.FC = () => {
           <div className="flex flex-row justify-center items-center gap-3 sm:gap-4 md:gap-8 mb-8">
             <div className="text-center">
               <a
-                href="https://www.oryarok.org.il"
+                href="https://www.haiku-code.com/projects-6"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:opacity-80 transition-opacity duration-200"
               >
                 <img
-                  src={orYarokLogo}
-                  alt="אור ירוק"
+                  src={haikuLogo}
+                  alt="Haiku"
                   className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain"
                 />
               </a>
@@ -123,15 +123,15 @@ const FooterContent: React.FC = () => {
 
             <div className="text-center">
               <a
-                href="https://www.haiku-code.com/projects-6"
+                href="https://www.oryarok.org.il"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:opacity-80 transition-opacity duration-200"
               >
                 <img
-                  src={haikuLogo}
-                  alt="Haiku"
-                  className="h-8 w-auto sm:h-10 md:h-12 lg:h-12 object-contain"
+                  src={orYarokLogo}
+                  alt="אור ירוק"
+                  className="h-6 w-auto translate-y-[2px] sm:h-[30px] md:h-9 lg:h-9 object-contain"
                 />
               </a>
             </div>
