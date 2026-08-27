@@ -2,9 +2,10 @@ import React, { useMemo, useEffect, useState } from 'react'
 import _ from 'lodash'
 import type { Options } from 'highcharts'
 import { Graph } from './Graph'
+import { GenderSplitBar } from './GenderSplitBar'
 import type { InjuredYearRecord, MonthlyRecord, SexRecord } from '../types'
 
-const years = ['2020', '2021', '2022', '2023', '2024', '2025'] as const
+const years = ['2021', '2022', '2023', '2024', '2025', '2026'] as const
 const HEBREW_MONTHS = [
   'ינואר',
   'פברואר',
@@ -19,6 +20,12 @@ const HEBREW_MONTHS = [
   'נובמבר',
   'דצמבר',
 ]
+
+const SEVERITIES = [
+  { key: 'light_injured_count', name: 'פצועים קל', color: '#ffd82b' },
+  { key: 'severly_injured_count', name: 'פצועים קשה', color: '#ff9f1c' },
+  { key: 'killed_count', name: 'הרוגים', color: '#d81c32' },
+] as const
 
 function getFromStatsByYear(stats: InjuredYearRecord[], year: number, severity: string) {
   const yearRecord =
@@ -37,25 +44,18 @@ function severityStatsByYear(
     type: 'line' as const,
     name,
     color,
-    data: [
-      getFromStatsByYear(stats, 2020, severity),
-      getFromStatsByYear(stats, 2021, severity),
-      getFromStatsByYear(stats, 2022, severity),
-      getFromStatsByYear(stats, 2023, severity),
-      getFromStatsByYear(stats, 2024, severity),
-      getFromStatsByYear(stats, 2025, severity),
-    ],
+    data: years.map((year) => getFromStatsByYear(stats, Number(year), severity)),
     key: `${name}-${severity}`,
   }
 }
 
+function severityTotal(stats: InjuredYearRecord[], severity: string) {
+  return _.sum(years.map((year) => getFromStatsByYear(stats, Number(year), severity)))
+}
+
 function lineOptions(stats: InjuredYearRecord[] | null): Options {
   const series = stats
-    ? [
-        severityStatsByYear(stats, 'light_injured_count', 'פצועים קל', '#ffd82b'),
-        severityStatsByYear(stats, 'severly_injured_count', 'פצועים קשה', '#ff9f1c'),
-        severityStatsByYear(stats, 'killed_count', 'הרוגים', '#d81c32'),
-      ]
+    ? SEVERITIES.map((s) => severityStatsByYear(stats, s.key, s.name, s.color))
     : []
   return {
     chart: { height: 250, type: 'line' },
@@ -108,41 +108,6 @@ function columnOptions(stats: MonthlyRecord[] | null): Options {
   }
 }
 
-function pieOptions(stats: SexRecord[] | null): Options {
-  const total = _.sumBy(stats, 'count_1') || 0
-  const series = [
-    {
-      colorByPoint: true,
-      type: 'pie',
-      data: _.map(stats, (s) => ({
-        name: (s as any).sex_hebrew,
-        y: total ? Math.trunc(((s as any).count_1 / total) * 10000) / 100 : 0,
-      })),
-      dataLabels: {
-        connectorWidth: 0,
-        connectorPadding: -10,
-        formatter: function (): string {
-          // @ts-expect-error Highcharts format context
-          return `${this.point.y}%`
-        },
-        distance: 15,
-        style: { fontSize: '12px', fontWeight: 'normal' },
-      },
-    } as any,
-  ]
-  return {
-    chart: { height: 250, type: 'pie' },
-    credits: { enabled: false },
-    title: { text: '' },
-    tooltip: { enabled: false },
-    series,
-    plotOptions: {
-      series: { enableMouseTracking: false, states: { hover: { enabled: false } } },
-      pie: { borderWidth: 0, borderColor: null as any, showInLegend: true },
-    },
-  }
-}
-
 type Props = {
   title: string
   injuredStats: InjuredYearRecord[] | null
@@ -154,7 +119,13 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
   const [isHighlighted, setIsHighlighted] = useState(false)
   const line = useMemo(() => lineOptions(injuredStats), [injuredStats])
   const column = useMemo(() => columnOptions(monthStats), [monthStats])
-  const pie = useMemo(() => pieOptions(genderStats), [genderStats])
+  const summary = useMemo(
+    () =>
+      injuredStats
+        ? SEVERITIES.map((s) => ({ ...s, total: severityTotal(injuredStats, s.key) }))
+        : null,
+    [injuredStats]
+  )
 
   useEffect(() => {
     if (title) {
@@ -166,43 +137,33 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
 
   return (
     <div>
-      <div className={`text-xl font-bold transition-all duration-300 ${
-        isHighlighted 
-          ? 'text-blue-600 scale-[1.03] drop-shadow-lg' 
-          : 'text-gray-800'
-      }`}>
+      <div
+        className={`text-xl font-bold transition-all duration-300 ${
+          isHighlighted ? 'text-blue-600 scale-[1.03] drop-shadow-lg' : 'text-gray-800'
+        }`}
+      >
         {title || ''}
       </div>
 
-      {injuredStats && (
-        <div className="text-sm font-semibold">
-          <div className="mb-1">ב-5 השנים האחרונות,</div>
-          {(() => {
-            const series = [
-              severityStatsByYear(injuredStats, 'light_injured_count', 'פצועים קל', '#ffd82b'),
-              severityStatsByYear(injuredStats, 'severly_injured_count', 'פצועים קשה', '#ff9f1c'),
-              severityStatsByYear(injuredStats, 'killed_count', 'הרוגים', '#d81c32'),
-            ]
-            const summary = series.reduce<Record<string, { sumInjured: number; color: string }>>(
-              (acc, s: any) => {
-                const sumInjured = _.sum(s.data as number[])
-                acc[s.name] = { sumInjured, color: s.color }
-                return acc
-              },
-              {}
-            )
-            return (
-              <div>
-                {Object.entries(summary).map(([k, v]) => (
-                  <div key={k}>
-                    {v.sumInjured} <span style={{ color: v.color }}>{k}</span>
-                  </div>
-                ))}
-                <div>בקרב הולכי רגל, רוכבי אופניים וקורקינט בגיל 5-19</div>
-              </div>
-            )
-          })()}
-        </div>
+      {summary && (
+        <p className="text-sm font-semibold leading-snug">
+          {/* the intro and the three counts stay on one line of their own; the
+              qualifier starts a new line. below lg the panel is too narrow to
+              hold the counts on one line, so they are allowed to wrap there */}
+          <span className="block lg:whitespace-nowrap">
+            ב-5 השנים האחרונות,{' '}
+            {summary.map((s, i) => (
+              <React.Fragment key={s.key}>
+                {s.total} <span style={{ color: s.color }}>{s.name}</span>
+                {i < summary.length - 1 && <span className="me-2">,</span>}
+              </React.Fragment>
+            ))}
+          </span>
+          <span className="block">
+            בקרב הולכי רגל, רוכבי אופניים וקורקינט בגיל{' '}
+            <span className="whitespace-nowrap">5-19</span>
+          </span>
+        </p>
       )}
 
       {injuredStats && (
@@ -212,17 +173,21 @@ export const Stats: React.FC<Props> = ({ title, injuredStats, monthStats, gender
         </section>
       )}
 
-      {monthStats && (
+      {/* the new-cbs-format build answers the months endpoint with an empty
+          array for every school, so an unguarded render would draw twelve empty
+          bars and read as "no accidents all year". length check, same as the
+          gender section below, so the heading goes away with the data. */}
+      {monthStats && monthStats.length > 0 && (
         <section>
           <div className="text-base font-semibold mb-1">נפגעים לפי חודש</div>
           <Graph options={column} />
         </section>
       )}
 
-      {genderStats && (
-        <section>
-          <div className="text-base font-semibold mb-1">נפגעים לפי מין</div>
-          <Graph options={pie} />
+      {genderStats && genderStats.length > 0 && (
+        <section className="mt-3">
+          <div className="text-base font-semibold mb-2">נפגעים לפי מין</div>
+          <GenderSplitBar stats={genderStats} />
         </section>
       )}
     </div>

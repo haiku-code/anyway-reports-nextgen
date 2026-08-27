@@ -10,6 +10,8 @@
     "deploy:stg": "npm run build:stg && firebase deploy --only hosting -P staging",
     "deploy:prod": "npm run build && netlify deploy --prod --dir=dist",
     "preview": "vite preview",
+    "data:build": "tsx scripts/data/build.ts",
+    "data:test": "tsx --test scripts/data/lib/*.test.ts",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write ."
@@ -31,6 +33,7 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@types/autosuggest-highlight": "^3.2.3",
     "@types/lodash": "^4.17.20",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.1.10",
     "@types/react-autosuggest": "^10.1.11",
     "@types/react-dom": "^19.1.7",
@@ -48,6 +51,7 @@
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^4.1.12",
+    "tsx": "^4.23.12",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
