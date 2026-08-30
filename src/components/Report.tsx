@@ -84,7 +84,7 @@ const FooterContent: React.FC = () => {
                 <div className="flex justify-center">
                   <span>
                     תודה מיוחדת: <strong>דרור רשף</strong>, <strong>אבי קליימן</strong>,{' '}
-                    <strong>תמר קליר</strong> וקהילת מתנדבי נתון לשינוי
+                    <strong>תמר קליר</strong> <strong>זיו הרפז</strong> וקהילת מתנדבי נתון לשינוי
                   </span>
                 </div>
               </div>
